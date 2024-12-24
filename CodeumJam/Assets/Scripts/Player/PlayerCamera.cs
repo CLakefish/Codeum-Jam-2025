@@ -17,13 +17,15 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private Camera cam;
     [SerializeField] private Transform pivot;
 
-    [SerializeField] private float positionSmoothing;
+    [Header("Interpolation")]
     [SerializeField] private float rotationSmoothing;
     [SerializeField] private float viewModelSmoothing;
     [SerializeField] private float distance, yOffset;
 
-    private Vector3 positionVelocity;
-    private Vector2 targetRotation, currentRotation, rotationVelocity;
+    private Vector2 targetRotation;
+    private Vector2 currentRotation;
+    private Vector2 rotationVelocity;
+    private float viewModelVel;
 
     private void Start() {
         PlayerInput.MouseLock = true;
@@ -52,10 +54,12 @@ public class PlayerCamera : MonoBehaviour
         float yAngleOffset = Mathf.Atan2(cam.transform.forward.z, cam.transform.forward.x) * Mathf.Rad2Deg - 90f;
 
         if (PlayerInput.Inputting) {
-            viewModel.transform.localEulerAngles = new Vector3(0, (Mathf.Atan2(PlayerInput.Inputs.normalized.x, PlayerInput.Inputs.normalized.y) * Mathf.Rad2Deg) - yAngleOffset, 0);
+            float newAngle = (Mathf.Atan2(PlayerInput.Inputs.normalized.x, PlayerInput.Inputs.normalized.y) * Mathf.Rad2Deg) - yAngleOffset;
+            float interpAngle = Mathf.SmoothDampAngle(viewModel.transform.localEulerAngles.y, newAngle, ref viewModelVel, viewModelSmoothing);
+            viewModel.transform.localEulerAngles = new Vector3(0, interpAngle, 0);
         }
 
         Vector3 endPos = Vector3.up * yOffset + rb.transform.position;
-        pivot.position = Vector3.SmoothDamp(pivot.position, endPos, ref positionVelocity, positionSmoothing);
+        pivot.position = endPos;
     }
 }
