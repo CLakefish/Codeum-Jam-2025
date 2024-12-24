@@ -21,18 +21,34 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private float rotationSmoothing;
     [SerializeField] private float viewModelSmoothing;
     [SerializeField] private float distance, yOffset;
+    [SerializeField] private Vector3 boxSize;
 
     private Vector2 targetRotation;
     private Vector2 currentRotation;
     private Vector2 rotationVelocity;
+    private Vector3 boxPosition;
     private float viewModelVel;
 
     private void Start() {
+        boxPosition = rb.transform.position + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
+
         PlayerInput.MouseLock = true;
+    }
+
+    public void SetBoxBoundBottom()
+    {
+        Vector3 pos = new(boxPosition.x, rb.transform.position.y, boxPosition.z);
+        boxPosition = pos + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
     }
 
     void Update()
     {
+        Vector3 dir = rb.transform.position - boxPosition;
+
+        if (Mathf.Abs(dir.x) > boxSize.x / 2.0f) boxPosition.x = rb.transform.position.x - Mathf.Sign(dir.x) * (boxSize.x / 2.0f);
+        if (Mathf.Abs(dir.y) > boxSize.y / 2.0f) boxPosition.y = rb.transform.position.y - Mathf.Sign(dir.y) * (boxSize.y / 2.0f);
+        if (Mathf.Abs(dir.z) > boxSize.z / 2.0f) boxPosition.z = rb.transform.position.z - Mathf.Sign(dir.z) * (boxSize.z / 2.0f);
+
         targetRotation.y += PlayerInput.AlteredMouseDelta.x;
         targetRotation.x -= PlayerInput.AlteredMouseDelta.y;
         targetRotation.x = Mathf.Clamp(targetRotation.x, -89f, 89f);
@@ -59,7 +75,15 @@ public class PlayerCamera : MonoBehaviour
             viewModel.transform.localEulerAngles = new Vector3(0, interpAngle, 0);
         }
 
-        Vector3 endPos = Vector3.up * yOffset + rb.transform.position;
+        Vector3 endPos = boxPosition - (Vector3.up * yOffset);
         pivot.position = endPos;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!Application.isPlaying) boxPosition = rb.transform.position + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(boxPosition, boxSize);
     }
 }

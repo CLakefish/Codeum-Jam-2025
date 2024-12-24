@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float castRadius;
     [SerializeField] private float fallCastDist, groundCastDist;
     [SerializeField] private float floorStickThreshold;
+    // Add ground stick speed
     [SerializeField] private float interpolateNormalSpeed;
 
     [Header("References")]
@@ -17,6 +18,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Collider col;
     [SerializeField] private Transform cam;
     [SerializeField] private PlayerInput PlayerInput;
+    [SerializeField] private PlayerCamera PlayerCamera;
 
     [Header("Gravity")]
     [SerializeField] private float gravityForce;
@@ -167,7 +169,9 @@ public class PlayerMovement : MonoBehaviour
         public override void Enter() { }
 
         // Called every update call (done via fsm.Update())
-        public override void Update() { }
+        public override void Update() {
+            context.PlayerCamera.SetBoxBoundBottom();
+        }
 
         // Called every fixed update call (done via fsm.FixedUpdate())
         public override void FixedUpdate()
@@ -178,7 +182,7 @@ public class PlayerMovement : MonoBehaviour
             Vector3 targetPos = new(context.rb.transform.position.x, context.GroundPoint.y + halfSize, context.rb.transform.position.z);
 
             if (yPos > yCheck) {
-                context.rb.MovePosition(targetPos + (Vector3.up * context.floorStickThreshold));
+                context.rb.MovePosition(targetPos);
                 context.SetY(0);
             }
 
@@ -222,5 +226,10 @@ public class PlayerMovement : MonoBehaviour
             context.Move();
             context.rb.AddForce(Vector3.down * context.gravityForce);
         }
+    }
+
+    private class TestState : State<PlayerMovement>
+    {
+        public TestState(PlayerMovement context) : base(context) { }
     }
 }
