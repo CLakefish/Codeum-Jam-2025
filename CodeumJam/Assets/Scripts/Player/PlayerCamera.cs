@@ -19,6 +19,7 @@ public class PlayerCamera : MonoBehaviour
 
     [Header("Interpolation")]
     [SerializeField] private float rotationSmoothing;
+    [SerializeField] private float positionSmoothing;
     [SerializeField] private float viewModelSmoothing;
     [SerializeField] private float distance, yOffset;
     [SerializeField] private Vector3 boxSize;
@@ -28,6 +29,7 @@ public class PlayerCamera : MonoBehaviour
     private Vector2 rotationVelocity;
     private Vector3 boxPosition;
     private float viewModelVel;
+    private float yVel;
 
     private void Start() {
         boxPosition = rb.transform.position + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
@@ -37,8 +39,9 @@ public class PlayerCamera : MonoBehaviour
 
     public void SetBoxBoundBottom()
     {
-        Vector3 pos = new(boxPosition.x, rb.transform.position.y, boxPosition.z);
-        boxPosition = pos + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
+        Vector3 pos    = new(boxPosition.x, rb.transform.position.y, boxPosition.z);
+        Vector3 offset = pos + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
+        boxPosition    = new Vector3(offset.x, Mathf.SmoothDamp(boxPosition.y, offset.y, ref yVel, positionSmoothing), offset.z);
     }
 
     void Update()
@@ -46,7 +49,12 @@ public class PlayerCamera : MonoBehaviour
         Vector3 dir = rb.transform.position - boxPosition;
 
         if (Mathf.Abs(dir.x) > boxSize.x / 2.0f) boxPosition.x = rb.transform.position.x - Mathf.Sign(dir.x) * (boxSize.x / 2.0f);
-        if (Mathf.Abs(dir.y) > boxSize.y / 2.0f) boxPosition.y = rb.transform.position.y - Mathf.Sign(dir.y) * (boxSize.y / 2.0f);
+
+        if (Mathf.Abs(dir.y) > boxSize.y / 2.0f) {
+            float desiredY = rb.transform.position.y - Mathf.Sign(dir.y) * (boxSize.y / 2.0f);
+            boxPosition.y = Mathf.SmoothDamp(boxPosition.y, desiredY, ref yVel, positionSmoothing);
+        }
+
         if (Mathf.Abs(dir.z) > boxSize.z / 2.0f) boxPosition.z = rb.transform.position.z - Mathf.Sign(dir.z) * (boxSize.z / 2.0f);
 
         targetRotation.y += PlayerInput.AlteredMouseDelta.x;

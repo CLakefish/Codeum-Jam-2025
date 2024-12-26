@@ -9,9 +9,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private LayerMask groundLayers;
     [SerializeField] private float castRadius;
     [SerializeField] private float fallCastDist, groundCastDist;
-    [SerializeField] private float floorStickThreshold;
-    // Add ground stick speed
-    [SerializeField] private float interpolateNormalSpeed;
+    [SerializeField] private float floorStickTime;
 
     [Header("References")]
     [SerializeField] private Rigidbody rb;
@@ -30,6 +28,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float coyoteTime;
     [SerializeField] private float jumpBufferTime;
 
+    private readonly float CORRECTION_DIST       = 1.75f;
+    private readonly float CORRECTION_RAD_REDUCT = 4.0f;
+    private readonly float FLOOR_STICK_THRESHOLD = 0.05f;
+
     private Vector3 MoveDir
     {
         get
@@ -40,13 +42,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private bool GroundCollision;
-    private bool SlopeCollision;
-    private Vector3 GroundNormal;
-    private Vector3 GroundPoint;
+    private bool GroundCollision  { get; set; }
+    private bool SlopeCollision   { get; set; }
+    private bool WalkingOffGround { get; set; }
+    private Vector3 GroundNormal  { get; set; }
+    private Vector3 GroundPoint   { get; set; }
 
     private Vector2 HorizontalVelocity;
-
     private float jumpBuffer = 0;
 
     private StateMachine<PlayerMovement> fsm;
@@ -86,6 +88,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        jumpBuffer -= Time.deltaTime;
+
         // Check the transitions, then update. You can invert this too or not update at all, either works. Hence why its seperated!
         // Updating calls the Update override function from the current state
         fsm.CheckTransitions();
@@ -98,6 +102,17 @@ public class PlayerMovement : MonoBehaviour
 
         // Fixed Update call calls the current state's fixed update function
         fsm.FixedUpdate();
+    }
+
+    private void OnGUI()
+    {
+        fsm.OnGUI();
+
+        GUILayout.BeginArea(new Rect(10, 150, 800, 200));
+
+        string current = $"Current Velocity: { rb.velocity }\nCurrent Magnitude: { rb.velocity.magnitude }";
+        GUILayout.Label($"<size=15>{current}</size>");
+        GUILayout.EndArea();
     }
 
     private void OnDrawGizmos()
@@ -118,7 +133,7 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 set = new(HorizontalVelocity.x, rb.velocity.y, HorizontalVelocity.y);
 
-        if (fsm.CurrentState == Walking) {
+        if (fsm.CurrentState == Walking && SlopeCollision) {
             set.y = 0;
             set = Quaternion.FromToRotation(Vector3.up, GroundNormal) * set;
         }
@@ -136,24 +151,29 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
-        Vector3 desiredNormal = ground.normal;
-        Vector3 dir = (ground.point - rb.transform.position).normalized;
+        Vector3 dir = new Vector3(Mathf.Sign(rb.velocity.x), 0, Mathf.Sign(rb.velocity.z)).normalized * (castRadius / CORRECTION_RAD_REDUCT);
 
-        if (Physics.Raycast(rb.transform.position, dir, out RaycastHit nonInterpolated, dir.magnitude + 0.01f, groundLayers))
+        if (Physics.Raycast(rb.transform.position + dir, Vector3.down, out RaycastHit nonInterpolated, CORRECTION_DIST, groundLayers))
         {
-            if (Vector3.Angle(Vector3.up, nonInterpolated.normal) >= 90) {
-                desiredNormal = Vector3.up;
+            WalkingOffGround = false;
+
+            if (Vector3.Angle(Vector3.up, nonInterpolated.normal) < 90) {
+                GroundNormal = ground.normal;
             }
             else {
-                desiredNormal = nonInterpolated.normal;
+                GroundNormal = Vector3.up;
             }
+        }
+        else
+        {
+            WalkingOffGround = true;
+            GroundNormal = Vector3.up;
         }
 
         float angle     = Vector3.Angle(Vector3.up, GroundNormal);
         SlopeCollision  = angle > 0 && angle < 90;
         GroundCollision = true;
         GroundPoint     = ground.point;
-        GroundNormal    = Vector3.MoveTowards(GroundNormal, desiredNormal, Time.fixedDeltaTime * interpolateNormalSpeed);
     }
 
     // When creating a state, make sure you have it inherit the state class, but ensure you have the template type set to the PlayerMovement.
@@ -161,6 +181,9 @@ public class PlayerMovement : MonoBehaviour
     // TL;DR everything can be private :)
     private class WalkingState : State<PlayerMovement>
     {
+        // Variables can be put in the states, they cannot be accessed by the hfsm!
+        private Vector3 stickVel;
+
         // Constructor, if you're making your own state just duplicate this and change the name from WalkingState to whatever it is you want it to be called :)
         public WalkingState(PlayerMovement context) : base(context) { }
 
@@ -178,19 +201,21 @@ public class PlayerMovement : MonoBehaviour
         {
             float halfSize    = 1;
             float yPos        = context.rb.transform.position.y - halfSize - context.GroundPoint.y;
-            float yCheck      = context.floorStickThreshold;
+            float yCheck      = context.FLOOR_STICK_THRESHOLD;
             Vector3 targetPos = new(context.rb.transform.position.x, context.GroundPoint.y + halfSize, context.rb.transform.position.z);
 
             if (yPos > yCheck) {
-                context.rb.MovePosition(targetPos);
-                context.SetY(0);
+                Vector3 currentPos = Vector3.SmoothDamp(context.rb.transform.position, targetPos, ref stickVel, context.floorStickTime, Mathf.Infinity, Time.fixedDeltaTime);
+                context.rb.MovePosition(currentPos);
             }
 
+            if (!context.SlopeCollision && !context.WalkingOffGround) context.SetY(0);
             context.Move();
         }
 
         // Called when the state is changed
-        public override void Exit() { }
+        public override void Exit() {
+        }
     }
 
     // Same applies to this as above
