@@ -35,6 +35,7 @@ public class PlayerMovement : MonoBehaviour
     [Header("Rolling")]
     [SerializeField] private float rollRotationSpeed;
     [SerializeField] private float rollJumpForce;
+    [SerializeField] private float rollBoostForce;
 
     private readonly float CORRECTION_DIST       = 1.75f;
     private readonly float CORRECTION_RAD_REDUCT = 4.0f;
@@ -87,7 +88,7 @@ public class PlayerMovement : MonoBehaviour
                                    
             new(Jumping, Falling,  () => fsm.Duration > 0 && rb.velocity.y < 0),
                                    
-            new(Falling, Walking,  () => GroundCollision),
+            new(Falling, Walking,  () => GroundCollision && fsm.Duration > 0.1f),
             new(Falling, Jumping,  () => PlayerInput.Jump.Pressed && fsm.PreviousState == Walking && fsm.Duration <= coyoteTime),
 
             new(null,    Rolling,  () => PlayerInput.Roll),
@@ -139,7 +140,6 @@ public class PlayerMovement : MonoBehaviour
 
     private void SetY(float y)  => rb.velocity = new Vector3(rb.velocity.x, y, rb.velocity.z);
     private void ApplyGravity() => rb.velocity -= gravityForce * Time.fixedDeltaTime * Vector3.up;
-
     private void Move(bool maintainMomentum = true)
     {
         float speed = maintainMomentum
@@ -156,6 +156,16 @@ public class PlayerMovement : MonoBehaviour
         }
 
         rb.velocity = set;
+    }
+
+    public void Launch(Vector3 force) {
+        rb.velocity += force;
+        SetY(force.y);
+        HorizontalVelocity += new Vector2(force.x, force.z);
+
+        if (fsm.CurrentState != Rolling) fsm.ChangeState(Falling);
+
+        GroundCollision = false;
     }
 
     private void CheckGroundCollisions()
@@ -206,9 +216,6 @@ public class PlayerMovement : MonoBehaviour
 
         // Called when state is first created
         // Ensure its marked as "public override void" rather than "public void", else it will not function!
-        public override void Enter() {
-            if (context.rb.velocity.y < 0) context.SetY(0);
-        }
 
         // Called every update call (done via fsm.Update())
         public override void Update() {
@@ -280,11 +287,30 @@ public class PlayerMovement : MonoBehaviour
             context.capsuleCol.enabled = false;
             context.sphereCol.enabled  = true;
             context.rb.freezeRotation  = false;
+
+            if (context.fsm.PreviousState == context.Walking)
+            {
+                Vector3 boost = context.MoveDir * context.rollBoostForce;
+                context.rb.velocity += boost;
+                context.HorizontalVelocity += new Vector2(boost.x, boost.z);
+            }
         }
 
         public override void Update()
         {
             if (context.PlayerInput.Jump.Pressed) context.jumpBuffer = context.jumpBufferTime;
+
+            if (context.PlayerInput.Inputting)
+            {
+                Vector3 currentVel  = context.rb.velocity;
+                Quaternion rotation = Quaternion.FromToRotation(currentVel.normalized, context.MoveDir);
+                Vector3 rotatedVel  = rotation * currentVel;
+                rotatedVel.y = 0;
+
+                Vector3 desiredVel  = Vector3.MoveTowards(currentVel, rotatedVel, Time.deltaTime * context.rollRotationSpeed);
+                desiredVel.y        = context.rb.velocity.y;
+                context.rb.velocity = desiredVel;
+            }
 
             if (context.GroundCollision)
             {
@@ -295,18 +321,6 @@ public class PlayerMovement : MonoBehaviour
                     context.jumpBuffer = 0;
                     context.SetY(context.rollJumpForce);
                 }
-            }
-
-            if (context.PlayerInput.Inputting)
-            {
-                Vector3 currentVel  = context.rb.velocity;
-                Quaternion rotation = Quaternion.FromToRotation(currentVel.normalized, context.MoveDir);
-                Vector3 rotatedVel  = rotation * currentVel;
-                rotatedVel.y = 0;
-
-                Vector3 desiredVel  = Vector3.MoveTowards(currentVel, rotatedVel, Time.deltaTime * context.rollRotationSpeed);
-                desiredVel.y = context.rb.velocity.y;
-                context.rb.velocity = desiredVel;
             }
         }
 

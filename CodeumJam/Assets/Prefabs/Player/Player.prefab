@@ -484,6 +484,7 @@ MonoBehaviour:
   jumpBufferTime: 0.1
   rollRotationSpeed: 20
   rollJumpForce: 15
+  rollBoostForce: 5
 --- !u!1 &5367752723028783740
 GameObject:
   m_ObjectHideFlags: 0
@@ -1156,7 +1157,7 @@ ParticleSystem:
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 100, y: 1, z: 100}
+    m_Scale: {x: 250, y: 1, z: 250}
     placementMode: 0
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -7509,7 +7510,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 615
+  m_VersionIndex: 618
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -9781,7 +9782,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 602
+  m_VersionIndex: 605
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -10251,7 +10252,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 1407
+  m_VersionIndex: 1410
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -12523,7 +12524,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 683
+  m_VersionIndex: 686
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []

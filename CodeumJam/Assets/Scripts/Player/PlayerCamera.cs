@@ -90,8 +90,8 @@ public class PlayerCamera : MonoBehaviour
 
     public void SetBoxBoundBottom()
     {
-        Vector3 pos = new(boxPosition.x, rb.transform.position.y, boxPosition.z);
+        Vector3 pos    = new(boxPosition.x, rb.transform.position.y, boxPosition.z);
         Vector3 offset = pos + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
-        boxPosition = new Vector3(offset.x, Mathf.SmoothDamp(boxPosition.y, offset.y, ref yVel, positionSmoothing), offset.z);
+        boxPosition    = new Vector3(offset.x, Mathf.SmoothDamp(boxPosition.y, offset.y, ref yVel, positionSmoothing), offset.z);
     }
 }
