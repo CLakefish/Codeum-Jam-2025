@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Collisions")]
     [SerializeField] private LayerMask groundLayers;
+    [SerializeField] private LayerMask playerLayer;
     [SerializeField] private float castRadius;
     [SerializeField] private float fallCastDist, groundCastDist;
     [SerializeField] private float floorStickTime;
@@ -288,6 +289,8 @@ public class PlayerMovement : MonoBehaviour
             context.sphereCol.enabled  = true;
             context.rb.freezeRotation  = false;
 
+            context.PlayerCamera.EnableSnowman(false);
+
             if (context.fsm.PreviousState == context.Walking)
             {
                 Vector3 boost = context.MoveDir * context.rollBoostForce;
@@ -298,6 +301,16 @@ public class PlayerMovement : MonoBehaviour
 
         public override void Update()
         {
+            Collider[] colliders = Physics.OverlapSphere(context.rb.position, context.sphereCol.radius + 0.01f, context.playerLayer);
+
+            foreach (var collider in colliders)
+            {
+                if (collider.TryGetComponent<Person>(out Person p))
+                {
+                    p.Launch(context.rb.position);
+                }
+            }
+
             if (context.PlayerInput.Jump.Pressed) context.jumpBuffer = context.jumpBufferTime;
 
             if (context.PlayerInput.Inputting)
@@ -327,6 +340,8 @@ public class PlayerMovement : MonoBehaviour
         public override void FixedUpdate()
         {
             context.ApplyGravity();
+
+            context.rb.angularVelocity = Quaternion.Euler(0, 90, 0) * context.rb.velocity;
         }
 
         public override void Exit()
@@ -335,9 +350,12 @@ public class PlayerMovement : MonoBehaviour
             context.rb.freezeRotation  = true;
             context.sphereCol.enabled  = false;
 
-            context.HorizontalVelocity = new(context.rb.velocity.x, context.rb.velocity.z);
+            context.rb.angularVelocity = Vector3.zero;
+            context.rb.rotation        = Quaternion.identity;
 
-            context.rb.transform.rotation = Quaternion.Euler(0, context.rb.transform.eulerAngles.y, 0);
+            context.PlayerCamera.EnableSnowman(true);
+
+            context.HorizontalVelocity = new(context.rb.velocity.x, context.rb.velocity.z);
         }
     }
 }

@@ -13,6 +13,10 @@ public class PlayerCamera : MonoBehaviour
     [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float spherecastRadius;
 
+    [Header("Viewmodels")]
+    [SerializeField] private GameObject snowmanModel;
+    [SerializeField] private GameObject orbModel;
+
     [Header("Camera References")]
     [SerializeField] private Camera cam;
     [SerializeField] private Transform pivot;
@@ -71,7 +75,7 @@ public class PlayerCamera : MonoBehaviour
         float yAngleOffset = Mathf.Atan2(cam.transform.forward.z, cam.transform.forward.x) * Mathf.Rad2Deg - 90f;
 
         if (PlayerInput.Inputting) {
-            float newAngle = (Mathf.Atan2(PlayerInput.Inputs.normalized.x, PlayerInput.Inputs.normalized.y) * Mathf.Rad2Deg) - yAngleOffset;
+            float newAngle    = (Mathf.Atan2(PlayerInput.Inputs.normalized.x, PlayerInput.Inputs.normalized.y) * Mathf.Rad2Deg) - yAngleOffset;
             float interpAngle = Mathf.SmoothDampAngle(viewModel.transform.localEulerAngles.y, newAngle, ref viewModelVel, viewModelSmoothing);
             viewModel.transform.localEulerAngles = new Vector3(0, interpAngle, 0);
         }
@@ -93,5 +97,11 @@ public class PlayerCamera : MonoBehaviour
         Vector3 pos    = new(boxPosition.x, rb.transform.position.y, boxPosition.z);
         Vector3 offset = pos + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
         boxPosition    = new Vector3(offset.x, Mathf.SmoothDamp(boxPosition.y, offset.y, ref yVel, positionSmoothing), offset.z);
+    }
+
+    public void EnableSnowman(bool active)
+    {
+        orbModel.SetActive(!active);
+        snowmanModel.SetActive(active);
     }
 }

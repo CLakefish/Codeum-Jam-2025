@@ -366,4 +366,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9469f91884a0ec44c8937d7a7c9f650b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPosition: {x: 0, y: 0, z: 0}
+  spawnPosition: {x: 0, y: 3, z: 0}
