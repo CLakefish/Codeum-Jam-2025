@@ -42,4 +42,10 @@ public class PlayerInput : MonoBehaviour
             return (Input.GetKeyDown(KeyCode.Space), Input.GetKey(KeyCode.Space));
         }
     }
+
+    public bool Roll {
+        get {
+            return Input.GetKey(KeyCode.R);
+        }
+    }
 }

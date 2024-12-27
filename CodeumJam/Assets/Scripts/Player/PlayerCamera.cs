@@ -37,14 +37,7 @@ public class PlayerCamera : MonoBehaviour
         PlayerInput.MouseLock = true;
     }
 
-    public void SetBoxBoundBottom()
-    {
-        Vector3 pos    = new(boxPosition.x, rb.transform.position.y, boxPosition.z);
-        Vector3 offset = pos + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
-        boxPosition    = new Vector3(offset.x, Mathf.SmoothDamp(boxPosition.y, offset.y, ref yVel, positionSmoothing), offset.z);
-    }
-
-    void Update()
+    private void Update()
     {
         Vector3 dir = rb.transform.position - boxPosition;
 
@@ -93,5 +86,12 @@ public class PlayerCamera : MonoBehaviour
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(boxPosition, boxSize);
+    }
+
+    public void SetBoxBoundBottom()
+    {
+        Vector3 pos = new(boxPosition.x, rb.transform.position.y, boxPosition.z);
+        Vector3 offset = pos + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
+        boxPosition = new Vector3(offset.x, Mathf.SmoothDamp(boxPosition.y, offset.y, ref yVel, positionSmoothing), offset.z);
     }
 }

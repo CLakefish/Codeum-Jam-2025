@@ -56,8 +56,7 @@ namespace HFSMFramework
                 {
                     GlobalTransitions.Add(transitions[i]);
 
-                    foreach (var pair in Transitions)
-                    {
+                    foreach (var pair in Transitions) {
                         pair.Value.Add(transitions[i]);
                     }
 
@@ -70,6 +69,7 @@ namespace HFSMFramework
 
                     foreach (var global in GlobalTransitions)
                     {
+                        if (global.TransitionState == transitions[i].CurrentState) continue;
                         Transitions[transitions[i].CurrentState].Add(global);
                     }
                 }

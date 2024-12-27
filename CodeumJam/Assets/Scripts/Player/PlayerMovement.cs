@@ -13,7 +13,8 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private Rigidbody rb;
-    [SerializeField] private Collider col;
+    [SerializeField] private CapsuleCollider capsuleCol;
+    [SerializeField] private SphereCollider sphereCol;
     [SerializeField] private Transform cam;
     [SerializeField] private PlayerInput PlayerInput;
     [SerializeField] private PlayerCamera PlayerCamera;
@@ -24,9 +25,16 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float acceleration;
+    [SerializeField] private float momentumConserveTimeGround;
+
+    [Header("Jumping")]
     [SerializeField] private float jumpForce;
     [SerializeField] private float coyoteTime;
     [SerializeField] private float jumpBufferTime;
+
+    [Header("Rolling")]
+    [SerializeField] private float rollRotationSpeed;
+    [SerializeField] private float rollJumpForce;
 
     private readonly float CORRECTION_DIST       = 1.75f;
     private readonly float CORRECTION_RAD_REDUCT = 4.0f;
@@ -36,8 +44,8 @@ public class PlayerMovement : MonoBehaviour
     {
         get
         {
-            Vector3 forwardNoY = new(cam.transform.forward.x, 0, cam.transform.forward.z);
-            Vector3 rightNoY   = new(cam.transform.right.x, 0, cam.transform.right.z);
+            Vector3 forwardNoY = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z).normalized;
+            Vector3 rightNoY   = new Vector3(cam.transform.right.x, 0, cam.transform.right.z).normalized;
             return forwardNoY * PlayerInput.Inputs.normalized.y + rightNoY * PlayerInput.Inputs.normalized.x;
         }
     }
@@ -51,11 +59,12 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 HorizontalVelocity;
     private float jumpBuffer = 0;
 
-    private StateMachine<PlayerMovement> fsm;
 
-    private WalkingState Walking { get; set; }
-    private JumpingState Jumping { get; set; }
-    private FallingState Falling { get; set; }
+    private StateMachine<PlayerMovement> fsm;
+    private WalkingState Walking   { get; set; }
+    private JumpingState Jumping   { get; set; }
+    private FallingState Falling   { get; set; }
+    private RollingState Rolling   { get; set; }
 
     private void OnEnable()
     {
@@ -63,22 +72,26 @@ public class PlayerMovement : MonoBehaviour
         fsm = new(this);
 
         // You also need to do the same with all states, its a bit obnoxious, might try to find a way to improve the code at some point but the time is not now haha
-        Walking = new(this);
-        Jumping = new(this);
-        Falling = new(this);
+        Walking  = new(this);
+        Jumping  = new(this);
+        Falling  = new(this);
+        Rolling  = new(this);
 
         // Initialize the FSM so that it has a reference to each state, and the transitions to and from each state
         fsm.AddTransitions(new()
         {
             /* STATE CURRENTLY IN */ /* STATE TRANSITIONING TO */ /* CONDITION FOR TRANSITION */
             // Syntax for bool expression follows the C# Func<bool> syntax, which is a bit odd, but it looks like this: () => { EXPRESSION }
-            new(Walking, Jumping, () => PlayerInput.Jump.Pressed || jumpBuffer > 0),
-            new(Walking, Falling, () => !GroundCollision),
+            new(Walking, Jumping,  () => PlayerInput.Jump.Pressed || jumpBuffer > 0),
+            new(Walking, Falling,  () => !GroundCollision),
+                                   
+            new(Jumping, Falling,  () => fsm.Duration > 0 && rb.velocity.y < 0),
+                                   
+            new(Falling, Walking,  () => GroundCollision),
+            new(Falling, Jumping,  () => PlayerInput.Jump.Pressed && fsm.PreviousState == Walking && fsm.Duration <= coyoteTime),
 
-            new(Jumping, Falling, () => fsm.Duration != 0 && rb.velocity.y < 0),
-
-            new(Falling, Walking, () => GroundCollision),
-            new(Falling, Jumping, () => PlayerInput.Jump.Pressed && fsm.PreviousState == Walking && fsm.Duration <= coyoteTime)
+            new(null,    Rolling,  () => PlayerInput.Roll),
+            new(Rolling, Falling,  () => !PlayerInput.Roll),
         });
 
         // Since the fsm initial state is not assigned at addition, you have to do it manually. Might change it
@@ -110,7 +123,7 @@ public class PlayerMovement : MonoBehaviour
 
         GUILayout.BeginArea(new Rect(10, 150, 800, 200));
 
-        string current = $"Current Velocity: { rb.velocity }\nCurrent Magnitude: { rb.velocity.magnitude }";
+        string current = $"Current Velocity: { rb.velocity }\nCurrent Magnitude: { rb.velocity.magnitude }\nRotational Velocity: {rb.angularVelocity}";
         GUILayout.Label($"<size=15>{current}</size>");
         GUILayout.EndArea();
     }
@@ -124,11 +137,15 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.DrawWireSphere(rb.transform.position + (Vector3.down * fallCastDist), castRadius);
     }
 
-    private void SetY(float y) => rb.velocity = new Vector3(rb.velocity.x, y, rb.velocity.z);
+    private void SetY(float y)  => rb.velocity = new Vector3(rb.velocity.x, y, rb.velocity.z);
+    private void ApplyGravity() => rb.velocity -= gravityForce * Time.fixedDeltaTime * Vector3.up;
 
-    private void Move()
+    private void Move(bool maintainMomentum = true)
     {
-        float speed        = Mathf.Max(moveSpeed, Mathf.Abs(new Vector2(rb.velocity.x, rb.velocity.z).magnitude));
+        float speed = maintainMomentum
+            ? Mathf.Max(moveSpeed, new Vector2(rb.velocity.x, rb.velocity.z).magnitude)
+            : moveSpeed;
+
         HorizontalVelocity = Vector2.MoveTowards(HorizontalVelocity, new Vector2(MoveDir.x, MoveDir.z) * speed, Time.fixedDeltaTime * acceleration);
 
         Vector3 set = new(HorizontalVelocity.x, rb.velocity.y, HorizontalVelocity.y);
@@ -189,7 +206,9 @@ public class PlayerMovement : MonoBehaviour
 
         // Called when state is first created
         // Ensure its marked as "public override void" rather than "public void", else it will not function!
-        public override void Enter() { }
+        public override void Enter() {
+            if (context.rb.velocity.y < 0) context.SetY(0);
+        }
 
         // Called every update call (done via fsm.Update())
         public override void Update() {
@@ -210,7 +229,7 @@ public class PlayerMovement : MonoBehaviour
             }
 
             if (!context.SlopeCollision && !context.WalkingOffGround) context.SetY(0);
-            context.Move();
+            context.Move(context.fsm.Duration < context.momentumConserveTimeGround);
         }
 
         // Called when the state is changed
@@ -231,7 +250,7 @@ public class PlayerMovement : MonoBehaviour
 
         public override void FixedUpdate() {
             context.Move();
-            context.rb.AddForce(Vector3.down * context.gravityForce);
+            context.ApplyGravity();
         }
     }
 
@@ -241,20 +260,70 @@ public class PlayerMovement : MonoBehaviour
 
         public override void Update()
         {
-            if (context.PlayerInput.Jump.Pressed)
-            {
+            if (context.PlayerInput.Jump.Pressed) {
                 context.jumpBuffer = context.jumpBufferTime;
             }
         }
 
         public override void FixedUpdate() {
             context.Move();
-            context.rb.AddForce(Vector3.down * context.gravityForce);
+            context.ApplyGravity();
         }
     }
 
-    private class TestState : State<PlayerMovement>
+    private class RollingState : State<PlayerMovement>
     {
-        public TestState(PlayerMovement context) : base(context) { }
+        public RollingState(PlayerMovement context) : base(context) { }
+
+        public override void Enter()
+        {
+            context.capsuleCol.enabled = false;
+            context.sphereCol.enabled  = true;
+            context.rb.freezeRotation  = false;
+        }
+
+        public override void Update()
+        {
+            if (context.PlayerInput.Jump.Pressed) context.jumpBuffer = context.jumpBufferTime;
+
+            if (context.GroundCollision)
+            {
+                context.PlayerCamera.SetBoxBoundBottom();
+
+                if (context.jumpBuffer > 0)
+                {
+                    context.jumpBuffer = 0;
+                    context.SetY(context.rollJumpForce);
+                }
+            }
+
+            if (context.PlayerInput.Inputting)
+            {
+                Vector3 currentVel  = context.rb.velocity;
+                Quaternion rotation = Quaternion.FromToRotation(currentVel.normalized, context.MoveDir);
+                Vector3 rotatedVel  = rotation * currentVel;
+                rotatedVel.y = 0;
+
+                Vector3 desiredVel  = Vector3.MoveTowards(currentVel, rotatedVel, Time.deltaTime * context.rollRotationSpeed);
+                desiredVel.y = context.rb.velocity.y;
+                context.rb.velocity = desiredVel;
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            context.ApplyGravity();
+        }
+
+        public override void Exit()
+        {
+            context.capsuleCol.enabled = true;
+            context.rb.freezeRotation  = true;
+            context.sphereCol.enabled  = false;
+
+            context.HorizontalVelocity = new(context.rb.velocity.x, context.rb.velocity.z);
+
+            context.rb.transform.rotation = Quaternion.Euler(0, context.rb.transform.eulerAngles.y, 0);
+        }
     }
 }
