@@ -447,8 +447,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4068377960683349645}
+  - component: {fileID: 3682014680447002597}
   - component: {fileID: 8271930189448522410}
   - component: {fileID: 5965798720975813070}
+  - component: {fileID: 2080998231137126866}
   - component: {fileID: 3583783913031493916}
   m_Layer: 0
   m_Name: Player
@@ -473,6 +475,26 @@ Transform:
   - {fileID: 634825721020455469}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3682014680447002597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4962997708126977312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dd48a1228ae74c34c9955fcf2f827106, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerMovement: {fileID: 3583783913031493916}
+  playerCamera: {fileID: 5965798720975813070}
+  playerInput: {fileID: 8271930189448522410}
+  playerViewmodel: {fileID: 2080998231137126866}
+  rb: {fileID: 2660859488455047891}
+  capsuleCollider: {fileID: 4625572330054863455}
+  sphereCollider: {fileID: 645076309818905038}
+  cam: {fileID: 7118694352382091937}
 --- !u!114 &8271930189448522410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -500,9 +522,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6701fcc27d2071f47be63ef31f1d9f61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerInput: {fileID: 8271930189448522410}
-  rb: {fileID: 2660859488455047891}
-  viewModel: {fileID: 6905160006013642371}
   groundLayer:
     serializedVersion: 2
     m_Bits: 1
@@ -513,10 +532,24 @@ MonoBehaviour:
   pivot: {fileID: 6617809486137644705}
   rotationSmoothing: 0.01
   positionSmoothing: 0.125
-  viewModelSmoothing: 0.1
   distance: 5
   yOffset: 0
   boxSize: {x: 0.01, y: 5, z: 0.01}
+--- !u!114 &2080998231137126866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4962997708126977312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69a94772a6a4c1741b5253db0a1c7214, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snowMan: {fileID: 938944323205619726}
+  snowBall: {fileID: 4604523423004037194}
+  viewmodelSmoothing: 0.1
 --- !u!114 &3583783913031493916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -539,12 +572,6 @@ MonoBehaviour:
   fallCastDist: 0.8
   groundCastDist: 1.1
   floorStickTime: 0.2
-  rb: {fileID: 2660859488455047891}
-  capsuleCol: {fileID: 4625572330054863455}
-  sphereCol: {fileID: 645076309818905038}
-  cam: {fileID: 6617809486137644705}
-  PlayerInput: {fileID: 8271930189448522410}
-  PlayerCamera: {fileID: 5965798720975813070}
   gravityForce: 48
   moveSpeed: 16
   acceleration: 100
@@ -554,7 +581,7 @@ MonoBehaviour:
   jumpBufferTime: 0.1
   rollRotationSpeed: 20
   rollJumpForce: 15
-  rollBoostForce: 5
+  rollBoostForce: 8
 --- !u!1 &5367752723028783740
 GameObject:
   m_ObjectHideFlags: 0
@@ -7580,7 +7607,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 621
+  m_VersionIndex: 624
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -9852,7 +9879,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 608
+  m_VersionIndex: 611
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -12594,7 +12621,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 1413
+  m_VersionIndex: 1416
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -14866,7 +14893,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 689
+  m_VersionIndex: 692
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []

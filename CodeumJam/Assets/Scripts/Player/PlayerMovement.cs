@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using HFSMFramework;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : Player.PlayerComponent
 {
     [Header("Collisions")]
     [SerializeField] private LayerMask groundLayers;
@@ -11,14 +11,6 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float castRadius;
     [SerializeField] private float fallCastDist, groundCastDist;
     [SerializeField] private float floorStickTime;
-
-    [Header("References")]
-    [SerializeField] private Rigidbody rb;
-    [SerializeField] private CapsuleCollider capsuleCol;
-    [SerializeField] private SphereCollider sphereCol;
-    [SerializeField] private Transform cam;
-    [SerializeField] private PlayerInput PlayerInput;
-    [SerializeField] private PlayerCamera PlayerCamera;
 
     [Header("Gravity")]
     [SerializeField] private float gravityForce;
@@ -132,6 +124,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        Rigidbody rb = GetComponentInChildren<Rigidbody>();
+
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(rb.transform.position + (Vector3.down * groundCastDist), castRadius);
 
@@ -285,13 +279,12 @@ public class PlayerMovement : MonoBehaviour
 
         public override void Enter()
         {
-            context.capsuleCol.enabled = false;
-            context.sphereCol.enabled  = true;
-            context.rb.freezeRotation  = false;
+            context.capsuleCollider.enabled = false;
+            context.sphereCollider.enabled  = true;
 
-            context.PlayerCamera.EnableSnowman(false);
+            context.PlayerViewmodel.Rolling(true);
 
-            if (context.fsm.PreviousState == context.Walking)
+            if (context.fsm.PreviousState == context.Walking && context.rb.velocity.magnitude <= context.moveSpeed)
             {
                 Vector3 boost = context.MoveDir * context.rollBoostForce;
                 context.rb.velocity += boost;
@@ -301,7 +294,7 @@ public class PlayerMovement : MonoBehaviour
 
         public override void Update()
         {
-            Collider[] colliders = Physics.OverlapSphere(context.rb.position, context.sphereCol.radius + 0.01f, context.playerLayer);
+            Collider[] colliders = Physics.OverlapSphere(context.rb.position, context.sphereCollider.radius + 0.01f, context.playerLayer);
 
             foreach (var collider in colliders)
             {
@@ -340,20 +333,14 @@ public class PlayerMovement : MonoBehaviour
         public override void FixedUpdate()
         {
             context.ApplyGravity();
-
-            context.rb.angularVelocity = Quaternion.Euler(0, 90, 0) * context.rb.velocity;
         }
 
         public override void Exit()
         {
-            context.capsuleCol.enabled = true;
-            context.rb.freezeRotation  = true;
-            context.sphereCol.enabled  = false;
+            context.capsuleCollider.enabled = true;
+            context.sphereCollider.enabled  = false;
 
-            context.rb.angularVelocity = Vector3.zero;
-            context.rb.rotation        = Quaternion.identity;
-
-            context.PlayerCamera.EnableSnowman(true);
+            context.PlayerViewmodel.Rolling(false);
 
             context.HorizontalVelocity = new(context.rb.velocity.x, context.rb.velocity.z);
         }

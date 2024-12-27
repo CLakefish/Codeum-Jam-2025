@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerInput : MonoBehaviour
+public class PlayerInput : Player.PlayerComponent
 {
     [SerializeField] private Vector2 mouseSensitivity;
     [SerializeField] private bool flipX, flipY;
