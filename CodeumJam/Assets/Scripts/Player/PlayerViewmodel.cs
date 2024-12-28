@@ -5,11 +5,15 @@ using UnityEngine;
 public class PlayerViewmodel : Player.PlayerComponent
 {
     [Header("Viewmodels")]
+    [SerializeField] private Transform viewmodel;
     [SerializeField] private GameObject snowMan;
     [SerializeField] private GameObject snowBall;
+    [SerializeField] private GameObject shadow;
 
     [Header("Smoothing")]
     [SerializeField] private float viewmodelSmoothing;
+    [SerializeField] private float snowManShadowSize;
+    [SerializeField] private float snowBallShadowSize;
 
     public GameObject Viewmodel {
         get {
@@ -19,6 +23,8 @@ public class PlayerViewmodel : Player.PlayerComponent
 
     public bool IsSnowman => isSnowman;
 
+    private const float Z_FIGHTING_PUSH = 0.015f;
+
     private bool isSnowman     = true;
     private float viewmodelVel = 0;
 
@@ -26,11 +32,16 @@ public class PlayerViewmodel : Player.PlayerComponent
 
     private void Update()
     {
-        if (!IsSnowman)
+        if (Physics.Raycast(rb.transform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, GroundLayer))
         {
-            rb.angularVelocity = Quaternion.Euler(0, 90, 0) * rb.velocity;
-            return;
+            shadow.transform.position   = hit.point + (Vector3.up * Z_FIGHTING_PUSH);
+            shadow.transform.forward    = hit.normal;
+            shadow.transform.localScale = Vector3.one * (IsSnowman ? snowManShadowSize : snowBallShadowSize);
         }
+
+        viewmodel.transform.position = rb.transform.position;
+
+        if (!IsSnowman) return;
 
         float yAngleOffset = Mathf.Atan2(Camera.transform.forward.z, Camera.transform.forward.x) * Mathf.Rad2Deg - 90f;
 
@@ -41,21 +52,30 @@ public class PlayerViewmodel : Player.PlayerComponent
         }
     }
 
+    private void FixedUpdate()
+    {
+        if (!IsSnowman) {
+            rb.angularVelocity = Quaternion.Euler(0, 90, 0) * rb.velocity;
+            snowBall.transform.rotation = rb.rotation;
+        }
+    }
+
     public void Rolling(bool active)
     {
+        rb.freezeRotation = !active;
+        isSnowman         = !active;
+
         if (!active) {
             rb.angularVelocity = Vector3.zero;
             rb.rotation        = prevRollRotation;
-            rb.transform.rotation = Quaternion.identity;
+
+            Viewmodel.transform.localEulerAngles = new Vector3(0, Viewmodel.transform.localEulerAngles.y, 0);
 
             Physics.SyncTransforms();
         }
         else {
             prevRollRotation = rb.rotation;
         }
-
-        rb.freezeRotation = !active;
-        isSnowman         = !active;
 
         snowBall.SetActive(active);
         snowMan.SetActive(!active);

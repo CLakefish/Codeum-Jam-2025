@@ -11,13 +11,17 @@ public class PlayerCamera : Player.PlayerComponent
     [SerializeField] private GameObject snowmanModel;
     [SerializeField] private GameObject orbModel;
 
-    [Header("Camera References")]
+    [Header("Camera")]
     [SerializeField] private Camera cam;
     [SerializeField] private Transform pivot;
+    [SerializeField] private float FOV;
 
     [Header("Interpolation")]
     [SerializeField] private float rotationSmoothing;
     [SerializeField] private float positionSmoothing;
+    [SerializeField] private float FOVInterpolation;
+
+    [Header("Offsets and Bounds")]
     [SerializeField] private float distance, yOffset;
     [SerializeField] private Vector3 boxSize;
 
@@ -25,12 +29,14 @@ public class PlayerCamera : Player.PlayerComponent
     private Vector2 currentRotation;
     private Vector2 rotationVelocity;
     private Vector3 boxPosition;
-    private float yVel;
+    private float currentFOV;
+    private float yVel, fovVel;
 
     private void Start() {
         boxPosition = rb.transform.position + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
 
         PlayerInput.MouseLock = true;
+        currentFOV = FOV;
     }
 
     private void Update()
@@ -58,6 +64,8 @@ public class PlayerCamera : Player.PlayerComponent
         // Positions
         cam.transform.localPosition = Vector3.forward * -(maxDist - spherecastRadius);
         pivot.position              = boxPosition - (Vector3.up * yOffset);
+
+        cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, currentFOV, ref fovVel, FOVInterpolation);
     }
 
     private void OnDrawGizmos()
@@ -94,4 +102,7 @@ public class PlayerCamera : Player.PlayerComponent
         Vector3 offset = pos + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
         boxPosition    = new Vector3(offset.x, Mathf.SmoothDamp(boxPosition.y, offset.y, ref yVel, positionSmoothing), offset.z);
     }
+
+    public void AddFOV(float value)   => currentFOV = value + FOV;
+    public void ResetFOV()            => currentFOV = FOV;
 }

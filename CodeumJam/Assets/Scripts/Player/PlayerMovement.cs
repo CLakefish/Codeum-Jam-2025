@@ -29,6 +29,9 @@ public class PlayerMovement : Player.PlayerComponent
     [SerializeField] private float rollRotationSpeed;
     [SerializeField] private float rollJumpForce;
     [SerializeField] private float rollBoostForce;
+    [SerializeField] private float rollIdleSpeed;
+    [SerializeField] private float rollBoostFOV;
+    [SerializeField] private float rollFOVReduction;
 
     [Header("Wall Jump")]
     [SerializeField] private float wallJumpForce;
@@ -66,7 +69,6 @@ public class PlayerMovement : Player.PlayerComponent
      
     private bool    WallCollision { get; set; }
     private Vector3 WallNormal    { get; set; }
-
 
     private Vector2 HorizontalVelocity;
     private float jumpBuffer = 0;
@@ -332,8 +334,11 @@ public class PlayerMovement : Player.PlayerComponent
             if (context.fsm.PreviousState == context.Walking && context.rb.velocity.magnitude <= context.moveSpeed)
             {
                 Vector3 boost = context.MoveDir * context.rollBoostForce;
-                context.rb.velocity += boost;
+
+                context.rb.velocity        += boost;
                 context.HorizontalVelocity += new Vector2(boost.x, boost.z);
+
+                context.PlayerCamera.AddFOV(context.rollBoostFOV);
             }
         }
 
@@ -343,17 +348,23 @@ public class PlayerMovement : Player.PlayerComponent
 
             foreach (var collider in colliders)
             {
-                if (collider.TryGetComponent<Launchable>(out Launchable p))
-                {
+                if (collider.TryGetComponent<Launchable>(out Launchable p)) {
                     p.Launch(context.rb.position);
                 }
             }
 
-            if (context.PlayerInput.Jump.Pressed) context.jumpBuffer = context.jumpBufferTime;
-
             if (context.PlayerInput.Inputting)
             {
-                Vector3    currentVel = context.rb.velocity;
+                Vector3 currentVel = context.rb.velocity;
+
+                if (currentVel.magnitude < context.rollIdleSpeed) {
+                    if (currentVel.magnitude <= Mathf.Epsilon) {
+                        currentVel = context.MoveDir.normalized;
+                    }
+
+                    currentVel = currentVel.normalized * context.rollIdleSpeed;
+                }
+
                 Quaternion rotation   = Quaternion.FromToRotation(currentVel.normalized, context.MoveDir);
                 Vector3    rotatedVel = rotation * currentVel;
                 rotatedVel.y = 0;
@@ -363,22 +374,21 @@ public class PlayerMovement : Player.PlayerComponent
                 context.rb.velocity = desiredVel;
             }
 
-            if (context.GroundCollision)
-            {
-                context.PlayerCamera.SetBoxBoundBottom();
+            if (context.PlayerInput.Jump.Pressed) {
+                context.jumpBuffer = context.jumpBufferTime;
+            }
 
-                if (context.jumpBuffer > 0)
-                {
-                    context.jumpBuffer = 0;
+            if (context.GroundCollision) {
+                if (context.jumpBuffer > 0) {
                     context.SetY(context.rollJumpForce);
                 }
             }
+
+            context.PlayerCamera.SetBoxBoundBottom();
+            context.PlayerCamera.AddFOV(context.rb.velocity.magnitude / context.rollFOVReduction);
         }
 
-        public override void FixedUpdate()
-        {
-            context.ApplyGravity();
-        }
+        public override void FixedUpdate() => context.ApplyGravity();
 
         public override void Exit()
         {
@@ -388,6 +398,7 @@ public class PlayerMovement : Player.PlayerComponent
             context.PlayerViewmodel.Rolling(false);
 
             context.HorizontalVelocity = new(context.rb.velocity.x, context.rb.velocity.z);
+            context.PlayerCamera.ResetFOV();
         }
     }
 
@@ -409,10 +420,7 @@ public class PlayerMovement : Player.PlayerComponent
             {
                 bool minLarger = Mathf.Abs(reflectAngle - min) > Mathf.Abs(reflectAngle - max);
                 reflectAngle   = minLarger ? max : min;
-                Debug.Log("true");
             }
-
-            Debug.Log("Normal: " + normalAngle + "\nReflected: " + reflectAngle);
 
             Vector3 dir   = new Vector3(Mathf.Cos(Mathf.Deg2Rad * reflectAngle), 0, Mathf.Sin(Mathf.Deg2Rad * reflectAngle)).normalized;
             Vector3 force = dir.normalized * context.wallJumpForce;
@@ -423,6 +431,7 @@ public class PlayerMovement : Player.PlayerComponent
             context.SetY(context.wallJumpHeight);
 
             context.jumpBuffer = 0;
+            context.PlayerCamera.SetBoxBoundBottom();
         }
 
         public override void FixedUpdate()
