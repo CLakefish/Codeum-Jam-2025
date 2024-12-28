@@ -583,7 +583,7 @@ MonoBehaviour:
   rollBoostForce: 8
   wallJumpForce: 15
   wallJumpHeight: 15
-  wallJumpTime: 0.25
+  wallJumpTime: 0.3
   wallJumpAngle: 45
 --- !u!1 &5367752723028783740
 GameObject:

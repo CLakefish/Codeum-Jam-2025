@@ -399,7 +399,7 @@ public class PlayerMovement : Player.PlayerComponent
         {
             float   normalAngle  = Repeat(Vector3.SignedAngle(context.WallNormal, Vector3.forward, Vector3.up) + 90.0f);
 
-            Vector3 reflect      = Vector3.Reflect(context.MoveDir, context.WallNormal).normalized;
+            Vector3 reflect      = Vector3.Reflect(context.MoveDir.normalized, context.WallNormal).normalized;
             float   reflectAngle = Repeat(Vector3.SignedAngle(reflect, Vector3.forward, Vector3.up) + 90.0f);
 
             float min = Repeat(normalAngle - context.wallJumpAngle);
@@ -407,9 +407,12 @@ public class PlayerMovement : Player.PlayerComponent
 
             if (!IsInRange(reflectAngle, min, max))
             {
-                bool minLarger = Mathf.Abs(Repeat(reflectAngle - min)) > Mathf.Abs(Repeat(reflectAngle - max));
-                reflectAngle = minLarger ? max : min;
+                bool minLarger = Mathf.Abs(reflectAngle - min) > Mathf.Abs(reflectAngle - max);
+                reflectAngle   = minLarger ? max : min;
+                Debug.Log("true");
             }
+
+            Debug.Log("Normal: " + normalAngle + "\nReflected: " + reflectAngle);
 
             Vector3 dir   = new Vector3(Mathf.Cos(Mathf.Deg2Rad * reflectAngle), 0, Mathf.Sin(Mathf.Deg2Rad * reflectAngle)).normalized;
             Vector3 force = dir.normalized * context.wallJumpForce;
@@ -429,12 +432,12 @@ public class PlayerMovement : Player.PlayerComponent
 
         private float Repeat(float value)
         {
-            return (value % 360 + 360) % 360;
+            return Mathf.Repeat(value, 360.0f);
         }
 
         private bool IsInRange(float reflectedNormal, float min, float max)
         {
-            if (min <= max)
+            if (min < max)
             {
                 return reflectedNormal >= min && reflectedNormal <= max;
             }
