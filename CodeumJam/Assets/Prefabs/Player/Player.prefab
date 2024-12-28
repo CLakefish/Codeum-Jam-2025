@@ -549,7 +549,7 @@ MonoBehaviour:
   cam: {fileID: 7118694352382091937}
   pivot: {fileID: 6617809486137644705}
   rotationSmoothing: 0.01
-  positionSmoothing: 0.125
+  positionSmoothing: 0.075
   distance: 5
   yOffset: 0
   boxSize: {x: 0.01, y: 5, z: 0.01}
@@ -581,9 +581,10 @@ MonoBehaviour:
   rollRotationSpeed: 20
   rollJumpForce: 15
   rollBoostForce: 8
-  wallJumpForce: 20
+  wallJumpForce: 15
   wallJumpHeight: 15
-  wallJumpTime: 0.2
+  wallJumpTime: 0.25
+  wallJumpMinDot: 0.1
 --- !u!1 &5367752723028783740
 GameObject:
   m_ObjectHideFlags: 0

@@ -34,6 +34,7 @@ public class PlayerMovement : Player.PlayerComponent
     [SerializeField] private float wallJumpForce;
     [SerializeField] private float wallJumpHeight;
     [SerializeField] private float wallJumpTime;
+    [SerializeField] private float wallJumpMinDot = -0.1f;
 
     private readonly float CORRECTION_DIST       = 1.75f;
     private readonly float CORRECTION_RAD_REDUCT = 4.0f;
@@ -396,14 +397,27 @@ public class PlayerMovement : Player.PlayerComponent
 
         public override void Enter()
         {
-            Vector3 dir   = context.WallNormal;
+            Vector3 dir;
+
+            if (Vector3.Dot(context.MoveDir, context.WallNormal) > context.wallJumpMinDot) {
+                dir = context.WallNormal;
+            }
+            else {
+                dir = Vector3.Reflect(context.MoveDir, context.WallNormal).normalized;
+            }
+
             Vector3 force = dir.normalized * context.wallJumpForce;
 
-            context.rb.velocity += force;
-
-            context.HorizontalVelocity = context.HorizontalVelocity.magnitude < new Vector2(force.x, force.z).magnitude 
-                ? new Vector2(force.x, force.z) 
-                : context.HorizontalVelocity + new Vector2(force.x, force.z);
+            if (new Vector2(context.rb.velocity.x, context.rb.velocity.z).magnitude < context.wallJumpForce)
+            {
+                context.rb.velocity += force;
+                context.HorizontalVelocity = new Vector2(force.x, force.z);
+            }
+            else
+            {
+                context.rb.velocity        = Quaternion.FromToRotation(context.rb.velocity.normalized, force.normalized) * context.rb.velocity;
+                context.HorizontalVelocity = Quaternion.FromToRotation(context.HorizontalVelocity.normalized, new Vector2(force.x, force.z).normalized) * context.HorizontalVelocity;
+            }
 
             context.SetY(context.wallJumpHeight);
 
