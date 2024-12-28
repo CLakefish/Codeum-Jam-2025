@@ -414,16 +414,8 @@ public class PlayerMovement : Player.PlayerComponent
             Vector3 dir   = new Vector3(Mathf.Cos(Mathf.Deg2Rad * reflectAngle), 0, Mathf.Sin(Mathf.Deg2Rad * reflectAngle)).normalized;
             Vector3 force = dir.normalized * context.wallJumpForce;
 
-            if (new Vector2(context.rb.velocity.x, context.rb.velocity.z).magnitude < context.wallJumpForce)
-            {
-                context.rb.velocity += force;
-                context.HorizontalVelocity = new Vector2(force.x, force.z);
-            }
-            else
-            {
-                context.rb.velocity        = Quaternion.FromToRotation(context.rb.velocity.normalized, force.normalized) * context.rb.velocity;
-                context.HorizontalVelocity = Quaternion.FromToRotation(context.HorizontalVelocity.normalized, new Vector2(force.x, force.z).normalized) * context.HorizontalVelocity;
-            }
+            context.rb.velocity += force;
+            context.HorizontalVelocity = new Vector2(context.rb.velocity.x, context.rb.velocity.z);
 
             context.SetY(context.wallJumpHeight);
 
