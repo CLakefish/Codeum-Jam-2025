@@ -11,26 +11,28 @@ public class PlayerViewmodel : Player.PlayerComponent
     [Header("Smoothing")]
     [SerializeField] private float viewmodelSmoothing;
 
-    public bool AllowRotation => allowRotation;
     public GameObject Viewmodel {
         get {
-            return AllowRotation ? snowMan : snowBall;
+            return IsSnowman ? snowMan : snowBall;
         }
     }
 
+    public bool IsSnowman => isSnowman;
+
+    private bool isSnowman     = true;
     private float viewmodelVel = 0;
-    private bool allowRotation = true;
+
     private Quaternion prevRollRotation;
 
     private void Update()
     {
-        if (!AllowRotation)
+        if (!IsSnowman)
         {
             rb.angularVelocity = Quaternion.Euler(0, 90, 0) * rb.velocity;
             return;
         }
 
-        float yAngleOffset = Mathf.Atan2(cam.transform.forward.z, cam.transform.forward.x) * Mathf.Rad2Deg - 90f;
+        float yAngleOffset = Mathf.Atan2(Camera.transform.forward.z, Camera.transform.forward.x) * Mathf.Rad2Deg - 90f;
 
         if (PlayerInput.Inputting) {
             float newAngle    = (Mathf.Atan2(PlayerInput.Inputs.normalized.x, PlayerInput.Inputs.normalized.y) * Mathf.Rad2Deg) - yAngleOffset;
@@ -41,20 +43,21 @@ public class PlayerViewmodel : Player.PlayerComponent
 
     public void Rolling(bool active)
     {
-        if (!active)
-        {
+        if (!active) {
             rb.angularVelocity = Vector3.zero;
             rb.rotation        = prevRollRotation;
+            rb.transform.rotation = Quaternion.identity;
+
+            Physics.SyncTransforms();
         }
-        else
-        {
+        else {
             prevRollRotation = rb.rotation;
         }
 
         rb.freezeRotation = !active;
+        isSnowman         = !active;
 
         snowBall.SetActive(active);
         snowMan.SetActive(!active);
-        allowRotation = !active;
     }
 }

@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] private CapsuleCollider capsuleCollider;
     [SerializeField] private SphereCollider  sphereCollider;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask playerLayer;
 
     [Header("Player Camera")]
     [SerializeField] private Camera cam;
@@ -31,15 +33,17 @@ public class Player : MonoBehaviour
         protected Player player;
         public void SetPlayer(Player player) => this.player = player;
 
-        public PlayerMovement PlayerMovement   => player.playerMovement;
-        public PlayerCamera PlayerCamera       => player.playerCamera;
-        public PlayerInput PlayerInput         => player.playerInput;
+        public PlayerMovement  PlayerMovement  => player.playerMovement;
+        public PlayerCamera    PlayerCamera    => player.playerCamera;
+        public PlayerInput     PlayerInput     => player.playerInput;
         public PlayerViewmodel PlayerViewmodel => player.playerViewmodel;
 
         public Rigidbody       rb              => player.rb;
-        public CapsuleCollider capsuleCollider => player.capsuleCollider;
-        public SphereCollider  sphereCollider => player.sphereCollider;
+        public CapsuleCollider CapsuleCollider => player.capsuleCollider;
+        public SphereCollider  SphereCollider  => player.sphereCollider;
+        public LayerMask       GroundLayer     => player.groundLayer;
+        public LayerMask       PlayerLayer     => player.playerLayer;
 
-        public Camera          cam => player.cam;
+        public Camera Camera => player.cam;
     }
 }

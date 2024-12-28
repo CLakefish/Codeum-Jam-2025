@@ -5,7 +5,6 @@ using UnityEngine;
 public class PlayerCamera : Player.PlayerComponent
 {
     [Header("Collisions")]
-    [SerializeField] private LayerMask groundLayer;
     [SerializeField] private float spherecastRadius;
 
     [Header("Viewmodels")]
@@ -52,7 +51,7 @@ public class PlayerCamera : Player.PlayerComponent
         // Collisions
         float maxDist = distance;
 
-        if (Physics.SphereCast(pivot.position, spherecastRadius, -pivot.forward, out RaycastHit hit, distance, groundLayer)) {
+        if (Physics.SphereCast(pivot.position, spherecastRadius, -pivot.forward, out RaycastHit hit, distance, GroundLayer)) {
             maxDist = (hit.point - pivot.position).magnitude - spherecastRadius;
         }
 

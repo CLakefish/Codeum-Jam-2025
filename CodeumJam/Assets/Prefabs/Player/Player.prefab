@@ -449,8 +449,8 @@ GameObject:
   - component: {fileID: 4068377960683349645}
   - component: {fileID: 3682014680447002597}
   - component: {fileID: 8271930189448522410}
-  - component: {fileID: 5965798720975813070}
   - component: {fileID: 2080998231137126866}
+  - component: {fileID: 5965798720975813070}
   - component: {fileID: 3583783913031493916}
   m_Layer: 0
   m_Name: Player
@@ -494,6 +494,12 @@ MonoBehaviour:
   rb: {fileID: 2660859488455047891}
   capsuleCollider: {fileID: 4625572330054863455}
   sphereCollider: {fileID: 645076309818905038}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 64
   cam: {fileID: 7118694352382091937}
 --- !u!114 &8271930189448522410
 MonoBehaviour:
@@ -510,31 +516,6 @@ MonoBehaviour:
   mouseSensitivity: {x: 3, y: 3}
   flipX: 0
   flipY: 0
---- !u!114 &5965798720975813070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4962997708126977312}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6701fcc27d2071f47be63ef31f1d9f61, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 1
-  spherecastRadius: 0.1
-  snowmanModel: {fileID: 938944323205619726}
-  orbModel: {fileID: 4604523423004037194}
-  cam: {fileID: 7118694352382091937}
-  pivot: {fileID: 6617809486137644705}
-  rotationSmoothing: 0.01
-  positionSmoothing: 0.125
-  distance: 5
-  yOffset: 0
-  boxSize: {x: 0.01, y: 5, z: 0.01}
 --- !u!114 &2080998231137126866
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -550,6 +531,28 @@ MonoBehaviour:
   snowMan: {fileID: 938944323205619726}
   snowBall: {fileID: 4604523423004037194}
   viewmodelSmoothing: 0.1
+--- !u!114 &5965798720975813070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4962997708126977312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6701fcc27d2071f47be63ef31f1d9f61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spherecastRadius: 0.1
+  snowmanModel: {fileID: 938944323205619726}
+  orbModel: {fileID: 4604523423004037194}
+  cam: {fileID: 7118694352382091937}
+  pivot: {fileID: 6617809486137644705}
+  rotationSmoothing: 0.01
+  positionSmoothing: 0.125
+  distance: 5
+  yOffset: 0
+  boxSize: {x: 0.01, y: 5, z: 0.01}
 --- !u!114 &3583783913031493916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -562,16 +565,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 689aedb7af2042c498abbe87db5694fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundLayers:
-    serializedVersion: 2
-    m_Bits: 1
-  playerLayer:
-    serializedVersion: 2
-    m_Bits: 64
   castRadius: 0.4
   fallCastDist: 0.8
   groundCastDist: 1.1
   floorStickTime: 0.2
+  wallCastIncrement: 8
+  wallCastDistance: 0.8
   gravityForce: 48
   moveSpeed: 16
   acceleration: 100
@@ -582,6 +581,9 @@ MonoBehaviour:
   rollRotationSpeed: 20
   rollJumpForce: 15
   rollBoostForce: 8
+  wallJumpForce: 20
+  wallJumpHeight: 15
+  wallJumpTime: 0.2
 --- !u!1 &5367752723028783740
 GameObject:
   m_ObjectHideFlags: 0
