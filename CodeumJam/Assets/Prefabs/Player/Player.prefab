@@ -584,7 +584,7 @@ MonoBehaviour:
   wallJumpForce: 15
   wallJumpHeight: 15
   wallJumpTime: 0.25
-  wallJumpMinDot: 0.1
+  wallJumpAngle: 45
 --- !u!1 &5367752723028783740
 GameObject:
   m_ObjectHideFlags: 0

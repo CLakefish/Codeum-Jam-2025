@@ -10,7 +10,6 @@ public class Person : MonoBehaviour
 
     public void Launch(Vector3 position)
     {
-        Debug.Log("hit!");
         rb.freezeRotation = false;
 
         Vector3 dir = (transform.position - position).normalized;

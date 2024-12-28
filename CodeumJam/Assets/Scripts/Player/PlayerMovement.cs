@@ -34,7 +34,7 @@ public class PlayerMovement : Player.PlayerComponent
     [SerializeField] private float wallJumpForce;
     [SerializeField] private float wallJumpHeight;
     [SerializeField] private float wallJumpTime;
-    [SerializeField] private float wallJumpMinDot = -0.1f;
+    [SerializeField] private float wallJumpAngle;
 
     private readonly float CORRECTION_DIST       = 1.75f;
     private readonly float CORRECTION_RAD_REDUCT = 4.0f;
@@ -397,15 +397,21 @@ public class PlayerMovement : Player.PlayerComponent
 
         public override void Enter()
         {
-            Vector3 dir;
+            float   normalAngle  = Repeat(Vector3.SignedAngle(context.WallNormal, Vector3.forward, Vector3.up) + 90.0f);
 
-            if (Vector3.Dot(context.MoveDir, context.WallNormal) > context.wallJumpMinDot) {
-                dir = context.WallNormal;
-            }
-            else {
-                dir = Vector3.Reflect(context.MoveDir, context.WallNormal).normalized;
+            Vector3 reflect      = Vector3.Reflect(context.MoveDir, context.WallNormal).normalized;
+            float   reflectAngle = Repeat(Vector3.SignedAngle(reflect, Vector3.forward, Vector3.up) + 90.0f);
+
+            float min = Repeat(normalAngle - context.wallJumpAngle);
+            float max = Repeat(normalAngle + context.wallJumpAngle);
+
+            if (!IsInRange(reflectAngle, min, max))
+            {
+                bool minLarger = Mathf.Abs(Repeat(reflectAngle - min)) > Mathf.Abs(Repeat(reflectAngle - max));
+                reflectAngle = minLarger ? max : min;
             }
 
+            Vector3 dir   = new Vector3(Mathf.Cos(Mathf.Deg2Rad * reflectAngle), 0, Mathf.Sin(Mathf.Deg2Rad * reflectAngle)).normalized;
             Vector3 force = dir.normalized * context.wallJumpForce;
 
             if (new Vector2(context.rb.velocity.x, context.rb.velocity.z).magnitude < context.wallJumpForce)
@@ -427,6 +433,23 @@ public class PlayerMovement : Player.PlayerComponent
         public override void FixedUpdate()
         {
             context.ApplyGravity();
+        }
+
+        private float Repeat(float value)
+        {
+            return (value % 360 + 360) % 360;
+        }
+
+        private bool IsInRange(float reflectedNormal, float min, float max)
+        {
+            if (min <= max)
+            {
+                return reflectedNormal >= min && reflectedNormal <= max;
+            }
+            else
+            {
+                return reflectedNormal >= min || reflectedNormal <= max;
+            }
         }
     }
 }
