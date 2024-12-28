@@ -61,6 +61,11 @@ sysinfo.txt
 *.unitypackage
 *.app
 
+# Settings we don't need to include
+
+/ProjectSettings\Packages\com.unity.polybrush\Settings.json
+/ProjectSettings\Packages\com.unity.probuilder\Settings.json
+
 # Crashlytics generated file
 crashlytics-build.properties
 
