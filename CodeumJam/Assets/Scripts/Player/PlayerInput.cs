@@ -45,7 +45,7 @@ public class PlayerInput : Player.PlayerComponent
 
     public bool Roll {
         get {
-            return Input.GetKey(KeyCode.LeftShift);
+            return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.R);
         }
     }
 }

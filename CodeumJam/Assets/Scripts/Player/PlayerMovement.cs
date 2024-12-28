@@ -343,7 +343,7 @@ public class PlayerMovement : Player.PlayerComponent
 
             foreach (var collider in colliders)
             {
-                if (collider.TryGetComponent<Person>(out Person p))
+                if (collider.TryGetComponent<Launchable>(out Launchable p))
                 {
                     p.Launch(context.rb.position);
                 }
