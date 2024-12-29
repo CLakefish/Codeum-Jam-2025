@@ -31,13 +31,36 @@ namespace HFSMFramework
         public float Duration { get; private set; }
 
         private readonly Dictionary<IState, List<Transition>> Transitions = new();
-        private readonly List<System.Action> onChange = new();
+        private readonly List<Action> onChange = new();
 
+        protected StateMachine<T> parent;
         protected T context;
 
         public StateMachine(T context) => this.context = context;
+        public StateMachine(T context, StateMachine<T> parent) {
+            this.context = context;
+            this.parent  = parent;
+        }
 
-        public void Start(IState startState)
+        public StateMachine<T> GetParent() {
+            return parent == null ? this : parent.GetParent();
+        }
+
+        public virtual void Enter() { }
+        public virtual void Exit()  { }
+
+        public virtual void Update()
+        {
+            CurrentState?.Update();
+            Duration += Time.deltaTime;
+        }
+
+        public virtual void FixedUpdate()
+        {
+            CurrentState?.FixedUpdate();
+        }
+
+        public void SetStartState(IState startState)
         {
             Duration = 0;
             CurrentState = startState;
@@ -81,17 +104,6 @@ namespace HFSMFramework
         }
 
         public void AddOnChange(List<System.Action> actions) => onChange.AddRange(actions);
-
-        public void Update()
-        {
-            CurrentState?.Update();
-            Duration += Time.deltaTime;
-        }
-
-        public void FixedUpdate()
-        {
-            CurrentState?.FixedUpdate();
-        }
 
         public void ChangeState(IState newState)
         {

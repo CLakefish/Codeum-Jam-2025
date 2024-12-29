@@ -28,6 +28,14 @@ public class Player : MonoBehaviour
         playerViewmodel.SetPlayer(this);
     }
 
+    public void AllowMovement(bool allow)
+    {
+        playerMovement.enabled    = allow;
+        playerCamera.canRotate    = allow;
+        playerCamera.SetParent(allow);
+        playerViewmodel.canRotate = allow;
+    }
+
     public class PlayerComponent : MonoBehaviour
     {
         protected Player player;

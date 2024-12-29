@@ -6,17 +6,10 @@ public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance;
 
+    [SerializeField] public CutsceneManager cutsceneManager;
+
     private readonly HashSet<Resettable> resettables           = new();
     private readonly HashSet<PointOfInterest> pointsOfInterest = new();
-
-    [Header("Camera")]
-    [SerializeField] private Camera viewCamera;
-    [SerializeField] private List<Transform> positions;
-    [SerializeField] private GameObject player;
-
-    [Header("Interpolation")]
-    [SerializeField] private float interpolationSpeed;
-    [SerializeField] private float positionThreshold;
     private bool levelComplete = false;
 
     private void OnEnable() {
@@ -24,19 +17,8 @@ public class LevelManager : MonoBehaviour
         GetReferences();
     }
 
-    private void Awake()
-    {
-        Application.targetFrameRate = 400;
-        StartCoroutine(IntroCutscene(""));
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            StopAllCoroutines();
-            StartCoroutine(IntroCutscene(""));
-        }
+    private void Start() {
+        cutsceneManager.TriggerCutscene(CutsceneManager.CutsceneType.Intro);
     }
 
     private void OnDrawGizmos()
@@ -48,67 +30,11 @@ public class LevelManager : MonoBehaviour
             Gizmos.DrawRay(point.transform.position, Vector3.up * 10);
         }
 
-        if (positions == null || positions.Count <= 1) return;
-
-        for (int i = 0; i < positions.Count; ++i)
+        Gizmos.color = Color.yellow;
+        foreach (var resettable in resettables)
         {
-            if (i > 0)
-            {
-                Gizmos.color = Color.green;
-                Gizmos.DrawLine(positions[i - 1].position, positions[i].position);
-            }
-
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(positions[i].position, 0.5f);
-
-            Gizmos.color = Color.blue;
-            Gizmos.DrawRay(positions[i].position, positions[i].forward * 5);
+            Gizmos.DrawRay(resettable.transform.position, Vector3.up * 5);
         }
-    }
-
-    private IEnumerator IntroCutscene(string displayName)
-    {
-        viewCamera.gameObject.SetActive(true);
-
-        Vector3 positionVelocity = Vector3.zero;
-        Vector3 rotationVelocity = Vector3.zero;
-
-        player.SetActive(false);
-
-        viewCamera.transform.position = positions[0].position;
-        viewCamera.transform.forward  = positions[0].forward;
-
-        for (int i = 0; i < positions.Count; ++i)
-        {
-            while (Vector3.Distance(viewCamera.transform.position, positions[i].position) > positionThreshold)
-            {
-                viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, positions[i].position, ref positionVelocity, interpolationSpeed);
-                viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward,   positions[i].forward, ref rotationVelocity, interpolationSpeed);
-                yield return null;
-            }
-
-            viewCamera.transform.position = positions[i].position;
-            viewCamera.transform.forward  = positions[i].forward;
-        }
-
-        player.SetActive(true);
-        PlayerCamera cam           = player.GetComponentInChildren<PlayerCamera>();
-        cam.canRotate = false;
-        cam.PlayerMovement.enabled = false;
-
-        Transform desiredPos = cam.Camera.transform;
-
-        while (Vector3.Distance(viewCamera.transform.position, desiredPos.position) > 0.01f)
-        {
-            viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, desiredPos.position, ref positionVelocity, interpolationSpeed);
-            viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward, desiredPos.forward, ref rotationVelocity, interpolationSpeed);
-            yield return null;
-        }
-
-        viewCamera.gameObject.SetActive(false);
-        cam.PlayerMovement.enabled = true;
-        cam.canRotate = true;
-        player.SetActive(true);
     }
 
     private void GetReferences() {
@@ -144,7 +70,6 @@ public class LevelManager : MonoBehaviour
         }
 
         levelComplete = true;
-
-        Debug.Log("Level Completed!");
+        cutsceneManager.TriggerCutscene(CutsceneManager.CutsceneType.End);
     }
 }

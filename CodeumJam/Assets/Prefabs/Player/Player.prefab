@@ -60,7 +60,7 @@ Transform:
   m_GameObject: {fileID: 1495417049153302551}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 1.5, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -451,6 +451,7 @@ MonoBehaviour:
   viewmodelSmoothing: 0.1
   snowManShadowSize: 1
   snowBallShadowSize: 1.75
+  canRotate: 0
 --- !u!114 &5965798720975813070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -490,10 +491,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   castRadius: 0.4
-  fallCastDist: 0.9
+  fallCastDist: 0.8
   groundCastDist: 1.25
   wallCastIncrement: 8
   wallCastDistance: 0.8
+  rollBounceCastDistance: 1.05
   gravityForce: 48
   moveSpeed: 16
   acceleration: 100
@@ -2782,7 +2784,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 648
+  m_VersionIndex: 651
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -5054,7 +5056,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 635
+  m_VersionIndex: 638
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -7947,7 +7949,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 1440
+  m_VersionIndex: 1443
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -10219,7 +10221,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 716
+  m_VersionIndex: 719
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []

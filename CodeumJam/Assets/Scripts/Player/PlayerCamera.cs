@@ -46,21 +46,20 @@ public class PlayerCamera : Player.PlayerComponent
 
     private void Update()
     {
+        if (!canRotate) return;
+
         BoxBoundCheck();
 
-        if (canRotate)
-        {
-            // Rotations
-            targetRotation.y += PlayerInput.AlteredMouseDelta.x;
-            targetRotation.x -= PlayerInput.AlteredMouseDelta.y;
-            targetRotation.x = Mathf.Clamp(targetRotation.x, -89f, 89f);
+        // Rotations
+        targetRotation.y += PlayerInput.AlteredMouseDelta.x;
+        targetRotation.x -= PlayerInput.AlteredMouseDelta.y;
+        targetRotation.x = Mathf.Clamp(targetRotation.x, -89f, 89f);
 
-            currentRotation = new Vector2(
-                Mathf.SmoothDampAngle(currentRotation.x, targetRotation.x, ref rotationVelocity.x, rotationSmoothing),
-                Mathf.SmoothDampAngle(currentRotation.y, targetRotation.y, ref rotationVelocity.y, rotationSmoothing));
+        currentRotation = new Vector2(
+            Mathf.SmoothDampAngle(currentRotation.x, targetRotation.x, ref rotationVelocity.x, rotationSmoothing),
+            Mathf.SmoothDampAngle(currentRotation.y, targetRotation.y, ref rotationVelocity.y, rotationSmoothing));
 
-            pivot.eulerAngles = new Vector3(currentRotation.x, currentRotation.y, 0f);
-        }
+        pivot.eulerAngles = new Vector3(currentRotation.x, currentRotation.y, 0f);
 
         CheckDist();
 
@@ -114,6 +113,7 @@ public class PlayerCamera : Player.PlayerComponent
         boxPosition    = new Vector3(offset.x, Mathf.SmoothDamp(boxPosition.y, offset.y, ref yVel, positionSmoothing), offset.z);
     }
 
-    public void AddFOV(float value)   => currentFOV = value + FOV;
-    public void ResetFOV()            => currentFOV = FOV;
+    public void SetParent(bool parentPivot) => Camera.transform.parent = parentPivot ? pivot.transform : null;
+    public void AddFOV(float value)         => currentFOV = value + FOV;
+    public void ResetFOV()                  => currentFOV = FOV;
 }

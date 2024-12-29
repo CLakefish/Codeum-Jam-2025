@@ -19,4 +19,10 @@ public class PointOfInterest : Launchable
         callback?.Invoke();
         base.Launch(position);
     }
+
+    private void OnCollisionEnter(Collision collision) {
+        if (collision.collider.TryGetComponent<Launchable>(out Launchable interest)) {
+            interest.Launch(transform.position);
+        }
+    }
 }

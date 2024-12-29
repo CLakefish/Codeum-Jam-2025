@@ -5,11 +5,16 @@ using HFSMFramework;
 
 public class PlayerMovement : Player.PlayerComponent
 {
-    [Header("Collisions")]
+    [Header("Ground Collisions")]
     [SerializeField] private float castRadius;
     [SerializeField] private float fallCastDist, groundCastDist;
-    [SerializeField] private int wallCastIncrement;
+
+    [Header("Wall Collisions")]
+    [SerializeField] private int   wallCastIncrement;
     [SerializeField] private float wallCastDistance;
+
+    [Header("Rolling Collision")]
+    [SerializeField] private float rollBounceCastDistance;
 
     [Header("Gravity")]
     [SerializeField] private float gravityForce;
@@ -37,15 +42,16 @@ public class PlayerMovement : Player.PlayerComponent
     [SerializeField] private float wallJumpTime;
     [SerializeField] private float wallJumpAngle;
 
-    private readonly float CORRECTION_DIST       = 1.75f;
-    private readonly float CORRECTION_RAD_REDUCT = 4.0f;
-    private readonly float FLOOR_STICK_THRESHOLD = 0.05f;
+    private readonly float CORRECTION_DIST          = 1.75f;
+    private readonly float CORRECTION_RAD_REDUCT    = 4.0f;
+    private readonly float FLOOR_STICK_THRESHOLD    = 0.05f;
+    private readonly float JUMP_GRACE_TIME          = 0.1f;
 
     private Vector3 MoveDir {
         get {
             Vector3 forwardNoY = new Vector3(Camera.transform.forward.x, 0, Camera.transform.forward.z).normalized;
             Vector3 rightNoY   = new Vector3(Camera.transform.right.x, 0, Camera.transform.right.z).normalized;
-            return forwardNoY * PlayerInput.Inputs.normalized.y + rightNoY * PlayerInput.Inputs.normalized.x;
+            return (forwardNoY * PlayerInput.Inputs.normalized.y + rightNoY * PlayerInput.Inputs.normalized.x).normalized;
         }
     }
 
@@ -59,19 +65,24 @@ public class PlayerMovement : Player.PlayerComponent
     private WalkingState  Walking  { get; set; }
     private JumpingState  Jumping  { get; set; }
     private FallingState  Falling  { get; set; }
-    private RollingState  Rolling  { get; set; }
     private WallJumpState WallJump { get; set; }
+
+
+    private RollingStateMachine Rolling { get; set; }
+    private RollingWalkState RollWalk   { get; set; }
+    private RollingJumpState RollJump   { get; set; }
+    private RollingFallState RollFall   { get; set; }
 
 
     private bool    GroundCollision  { get; set; }
     private bool    SlopeCollision   { get; set; }
     private bool    WalkingOffGround { get; set; }
+    private bool WallCollision       { get; set; }
     private Vector3 GroundNormal     { get; set; }
     private Vector3 GroundPoint      { get; set; }
-     
-    private bool    WallCollision { get; set; }
-    private Vector3 WallNormal    { get; set; }
+    private Vector3 WallNormal       { get; set; }
 
+    private bool Launched { get; set; }
     private Vector2 HorizontalVelocity;
     private float jumpBuffer = 0;
 
@@ -84,8 +95,24 @@ public class PlayerMovement : Player.PlayerComponent
         Walking  = new(this);
         Jumping  = new(this);
         Falling  = new(this);
-        Rolling  = new(this);
         WallJump = new(this);
+
+        Rolling  = new(this, fsm);
+        RollWalk = new(this);
+        RollJump = new(this);
+        RollFall = new(this);
+
+        Rolling.AddTransitions(new()
+        {
+            new(RollWalk, RollFall, () => !GroundCollision),
+            new(RollWalk, RollJump, () => PlayerInput.Jump.Pressed || jumpBuffer > 0),
+            new(RollJump, RollFall, () => fsm.Duration > 0 && rb.velocity.y < 0),
+            new(RollJump, RollFall, () => GroundCollision && fsm.Duration > JUMP_GRACE_TIME),
+            new(RollFall, RollJump, () => PlayerInput.Jump.Pressed && Rolling.PreviousState == RollWalk && Rolling.Duration <= coyoteTime),
+            new(RollFall, RollWalk, () => GroundCollision),
+        });
+
+        Rolling.SetStartState(RollWalk);
 
         // Initialize the FSM so that it has a reference to each state, and the transitions to and from each state
         fsm.AddTransitions(new()
@@ -96,6 +123,7 @@ public class PlayerMovement : Player.PlayerComponent
             new(Walking, Falling,  () => !GroundCollision),
                                    
             new(Jumping, Falling,  () => fsm.Duration > 0 && rb.velocity.y < 0),
+            new(Jumping, Walking,  () => fsm.Duration > JUMP_GRACE_TIME && GroundCollision),
             new(Jumping, WallJump, () => (PlayerInput.Jump.Pressed || jumpBuffer > 0) && WallCollision && fsm.Duration > 0),
                                    
             new(Falling, Walking,  () => GroundCollision && fsm.Duration > 0.1f),
@@ -111,7 +139,7 @@ public class PlayerMovement : Player.PlayerComponent
 
         // Since the fsm initial state is not assigned at addition, you have to do it manually. Might change it
         // Initialize HFSM with state
-        fsm.Start(Walking);
+        fsm.SetStartState(Walking);
     }
 
     void Update()
@@ -191,6 +219,7 @@ public class PlayerMovement : Player.PlayerComponent
         if (fsm.CurrentState != Rolling) fsm.ChangeState(Falling);
 
         GroundCollision = false;
+        Launched = true;
     }
 
     private void CheckGroundCollisions()
@@ -224,6 +253,8 @@ public class PlayerMovement : Player.PlayerComponent
         SlopeCollision  = angle > 0 && angle < 90;
         GroundCollision = true;
         GroundPoint     = ground.point;
+
+        Launched = false;
     }
 
     private void CheckWallCollisions()
@@ -316,9 +347,60 @@ public class PlayerMovement : Player.PlayerComponent
         }
     }
 
-    private class RollingState : State<PlayerMovement>
+    private class WallJumpState : State<PlayerMovement>
     {
-        public RollingState(PlayerMovement context) : base(context) { }
+        public WallJumpState(PlayerMovement context) : base(context) { }
+
+        public override void Enter()
+        {
+            float normalAngle = Repeat(Vector3.SignedAngle(context.WallNormal, Vector3.forward, Vector3.up) + 90.0f);
+            Vector3 reflect = Vector3.Reflect(context.MoveDir, context.WallNormal).normalized;
+            float reflectAngle = Repeat(Vector3.SignedAngle(reflect, Vector3.forward, Vector3.up) + 90.0f);
+
+            float min = Repeat(normalAngle - context.wallJumpAngle);
+            float max = Repeat(normalAngle + context.wallJumpAngle);
+
+            if (!IsInRange(reflectAngle, min, max))
+            {
+                bool minLarger = Mathf.Abs(reflectAngle - min) > Mathf.Abs(reflectAngle - max);
+                reflectAngle = minLarger ? max : min;
+            }
+
+            Vector3 dir = new Vector3(Mathf.Cos(Mathf.Deg2Rad * reflectAngle), 0, Mathf.Sin(Mathf.Deg2Rad * reflectAngle)).normalized;
+            Vector3 force = dir.normalized * context.wallJumpForce;
+
+            context.rb.velocity += force;
+            context.HorizontalVelocity = new Vector2(context.rb.velocity.x, context.rb.velocity.z);
+
+            context.SetY(context.wallJumpHeight);
+
+            context.jumpBuffer = 0;
+            context.PlayerCamera.SetBoxBoundBottom();
+        }
+
+        public override void FixedUpdate() => context.ApplyGravity();
+
+        private float Repeat(float value)
+        {
+            return Mathf.Repeat(value, 360.0f);
+        }
+
+        private bool IsInRange(float reflectedNormal, float min, float max)
+        {
+            if (min < max)
+            {
+                return reflectedNormal >= min && reflectedNormal <= max;
+            }
+            else
+            {
+                return reflectedNormal >= min || reflectedNormal <= max;
+            }
+        }
+    }
+
+    private class RollingStateMachine : StateMachine<PlayerMovement>
+    {
+        public RollingStateMachine(PlayerMovement context, StateMachine<PlayerMovement> parent) : base(context, parent) { }
 
         public override void Enter()
         {
@@ -329,10 +411,10 @@ public class PlayerMovement : Player.PlayerComponent
 
             if (context.fsm.PreviousState == context.Walking && context.rb.velocity.magnitude <= context.moveSpeed)
             {
-                Vector3 dir   = context.PlayerInput.Inputting ? context.MoveDir.normalized : context.PlayerCamera.Camera.transform.forward;
+                Vector3 dir = context.PlayerInput.Inputting ? context.MoveDir : context.PlayerCamera.Camera.transform.forward;
                 Vector3 boost = context.rollBoostForce * dir;
 
-                context.rb.velocity        += boost;
+                context.rb.velocity += boost;
                 context.HorizontalVelocity += new Vector2(boost.x, boost.z);
 
                 context.PlayerCamera.AddFOV(context.PlayerCamera.rollBoostFOV);
@@ -341,12 +423,12 @@ public class PlayerMovement : Player.PlayerComponent
 
         public override void Update()
         {
-            if (context.PlayerInput.Jump.Pressed) {
-                context.jumpBuffer = context.jumpBufferTime;
-            }
+            CheckTransitions();
 
             context.PlayerCamera.SetBoxBoundBottom();
             context.PlayerCamera.AddFOV(context.rb.velocity.magnitude / context.PlayerCamera.rollFOVReduction);
+
+            base.Update();
         }
 
         public override void FixedUpdate()
@@ -361,39 +443,37 @@ public class PlayerMovement : Player.PlayerComponent
                 }
             }
 
-            if (Physics.SphereCast(context.rb.position, 1.5f, context.MomentumNoY.normalized, out RaycastHit hit, context.SphereCollider.radius + 0.1f, context.GroundLayer))
+            if (Physics.SphereCast(context.rb.position, context.SphereCollider.radius, context.MomentumNoY.normalized, out RaycastHit hit, context.rollBounceCastDistance, context.GroundLayer))
             {
                 if (hit.rigidbody == null && Vector3.Angle(Vector3.up, hit.normal) >= context.rollMinBounceAngle)
                 {
-                    Vector3 rotatedVel  = Vector3.Reflect(context.rb.velocity, hit.normal);
-                    rotatedVel.y        = 0;
-                    rotatedVel          = rotatedVel.normalized * context.rb.velocity.magnitude;
+                    Vector3 rotatedVel = Vector3.Reflect(context.rb.velocity, hit.normal);
+                    rotatedVel.y = 0;
+                    rotatedVel = rotatedVel.normalized * context.rb.velocity.magnitude;
                     context.rb.velocity = rotatedVel;
                 }
             }
 
-            if (context.GroundCollision && context.jumpBuffer > 0) {
-                context.SetY(context.rollJumpForce);
+            if (context.PlayerInput.Inputting)
+            {
+                Vector3 currentVel = context.MomentumNoY.normalized;
+                Vector3 targetVel = context.MoveDir;
+                Vector3 newVel = Vector3.RotateTowards(currentVel, targetVel, context.rollRotationSpeed * Time.deltaTime, 0f);
+
+                newVel = newVel.normalized * context.MomentumNoY.magnitude;
+                newVel.y = context.rb.velocity.y;
+                context.rb.velocity = newVel;
             }
 
             context.ApplyGravity();
 
-            if (context.PlayerInput.Inputting)
-            {
-                Vector3 currentVel  = context.MomentumNoY.normalized;
-                Vector3 targetVel   = context.MoveDir.normalized;
-                Vector3 newVel      = Vector3.RotateTowards(currentVel, targetVel, context.rollRotationSpeed * Time.deltaTime, 0f);
-
-                newVel   = newVel.normalized * context.MomentumNoY.magnitude;
-                newVel.y = context.rb.velocity.y;
-                context.rb.velocity = newVel;
-            }
+            base.FixedUpdate();
         }
 
         public override void Exit()
         {
             context.CapsuleCollider.enabled = true;
-            context.SphereCollider.enabled  = false;
+            context.SphereCollider.enabled = false;
 
             context.PlayerViewmodel.Rolling(false);
 
@@ -402,49 +482,30 @@ public class PlayerMovement : Player.PlayerComponent
         }
     }
 
-    private class WallJumpState : State<PlayerMovement>
+
+    private class RollingWalkState : State<PlayerMovement>
     {
-        public WallJumpState(PlayerMovement context) : base(context) { }
+        public RollingWalkState(PlayerMovement context) : base(context) { }
+    }
 
-        public override void Enter()
+    private class RollingJumpState : State<PlayerMovement>
+    {
+        public RollingJumpState(PlayerMovement context) : base(context) { }
+
+        public override void Enter() {
+            if (context.rb.velocity.y <= 0 || context.Launched) context.SetY(context.rollJumpForce);
+            else context.rb.velocity += Vector3.up * context.rollJumpForce;
+        }
+    }
+
+    private class RollingFallState : State<PlayerMovement>
+    {
+        public RollingFallState(PlayerMovement context) : base(context) { }
+
+        public override void Update()
         {
-            float   normalAngle  = Repeat(Vector3.SignedAngle(context.WallNormal, Vector3.forward, Vector3.up) + 90.0f);
-            Vector3 reflect      = Vector3.Reflect(context.MoveDir, context.WallNormal).normalized;
-            float   reflectAngle = Repeat(Vector3.SignedAngle(reflect, Vector3.forward, Vector3.up) + 90.0f);
-
-            float min = Repeat(normalAngle - context.wallJumpAngle);
-            float max = Repeat(normalAngle + context.wallJumpAngle);
-
-            if (!IsInRange(reflectAngle, min, max))
-            {
-                bool minLarger = Mathf.Abs(reflectAngle - min) > Mathf.Abs(reflectAngle - max);
-                reflectAngle   = minLarger ? max : min;
-            }
-
-            Vector3 dir   = new Vector3(Mathf.Cos(Mathf.Deg2Rad * reflectAngle), 0, Mathf.Sin(Mathf.Deg2Rad * reflectAngle)).normalized;
-            Vector3 force = dir.normalized * context.wallJumpForce;
-
-            context.rb.velocity       += force;
-            context.HorizontalVelocity = new Vector2(context.rb.velocity.x, context.rb.velocity.z);
-
-            context.SetY(context.wallJumpHeight);
-
-            context.jumpBuffer = 0;
-            context.PlayerCamera.SetBoxBoundBottom();
-        }
-
-        public override void FixedUpdate() => context.ApplyGravity();
-
-        private float Repeat(float value) {
-            return Mathf.Repeat(value, 360.0f);
-        }
-
-        private bool IsInRange(float reflectedNormal, float min, float max) {
-            if (min < max) {
-                return reflectedNormal >= min && reflectedNormal <= max;
-            }
-            else {
-                return reflectedNormal >= min || reflectedNormal <= max;
+            if (context.PlayerInput.Jump.Pressed) {
+                context.jumpBuffer = context.jumpBufferTime;
             }
         }
     }

@@ -25,7 +25,8 @@ public class PlayerViewmodel : Player.PlayerComponent
 
     private const float Z_FIGHTING_PUSH = 0.015f;
 
-    private bool isSnowman     = true;
+    private bool isSnowman = true;
+    public bool canRotate  = true;
     private float viewmodelVel = 0;
 
     private Quaternion prevRollRotation;
@@ -41,7 +42,7 @@ public class PlayerViewmodel : Player.PlayerComponent
 
         viewmodel.transform.position = rb.transform.position;
 
-        if (!IsSnowman) return;
+        if (!IsSnowman || !canRotate) return;
 
         float yAngleOffset = Mathf.Atan2(Camera.transform.forward.z, Camera.transform.forward.x) * Mathf.Rad2Deg - 90f;
 
