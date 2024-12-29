@@ -8,7 +8,6 @@ public class PlayerMovement : Player.PlayerComponent
     [Header("Collisions")]
     [SerializeField] private float castRadius;
     [SerializeField] private float fallCastDist, groundCastDist;
-    [SerializeField] private float floorStickTime;
     [SerializeField] private int wallCastIncrement;
     [SerializeField] private float wallCastDistance;
 
@@ -30,8 +29,7 @@ public class PlayerMovement : Player.PlayerComponent
     [SerializeField] private float rollJumpForce;
     [SerializeField] private float rollBoostForce;
     [SerializeField] private float rollIdleSpeed;
-    [SerializeField] private float rollBoostFOV;
-    [SerializeField] private float rollFOVReduction;
+    [SerializeField] private float rollMinBounceAngle;
 
     [Header("Wall Jump")]
     [SerializeField] private float wallJumpForce;
@@ -43,13 +41,17 @@ public class PlayerMovement : Player.PlayerComponent
     private readonly float CORRECTION_RAD_REDUCT = 4.0f;
     private readonly float FLOOR_STICK_THRESHOLD = 0.05f;
 
-    private Vector3 MoveDir
-    {
-        get
-        {
+    private Vector3 MoveDir {
+        get {
             Vector3 forwardNoY = new Vector3(Camera.transform.forward.x, 0, Camera.transform.forward.z).normalized;
             Vector3 rightNoY   = new Vector3(Camera.transform.right.x, 0, Camera.transform.right.z).normalized;
             return forwardNoY * PlayerInput.Inputs.normalized.y + rightNoY * PlayerInput.Inputs.normalized.x;
+        }
+    }
+
+    private Vector3 MomentumNoY {
+        get {
+            return new(rb.velocity.x, 0, rb.velocity.z);
         }
     }
 
@@ -94,11 +96,11 @@ public class PlayerMovement : Player.PlayerComponent
             new(Walking, Falling,  () => !GroundCollision),
                                    
             new(Jumping, Falling,  () => fsm.Duration > 0 && rb.velocity.y < 0),
-            new(Jumping, WallJump, () => PlayerInput.Jump.Pressed && WallCollision && fsm.Duration > 0),
+            new(Jumping, WallJump, () => (PlayerInput.Jump.Pressed || jumpBuffer > 0) && WallCollision && fsm.Duration > 0),
                                    
             new(Falling, Walking,  () => GroundCollision && fsm.Duration > 0.1f),
             new(Falling, Jumping,  () => PlayerInput.Jump.Pressed && fsm.PreviousState == Walking && fsm.Duration <= coyoteTime),
-            new(Falling, WallJump, () => WallCollision && !GroundCollision && PlayerInput.Jump.Pressed),
+            new(Falling, WallJump, () => PlayerInput.Jump.Pressed && WallCollision && !GroundCollision),
 
             new(null,    Rolling,  () => PlayerInput.Roll),
             new(Rolling, Falling,  () => !PlayerInput.Roll),
@@ -195,8 +197,7 @@ public class PlayerMovement : Player.PlayerComponent
     {
         float dist = fsm.CurrentState == Walking ? groundCastDist : fallCastDist;
 
-        if (!Physics.SphereCast(rb.transform.position, castRadius, Vector3.down, out RaycastHit ground, dist, GroundLayer))
-        {
+        if (!Physics.SphereCast(rb.transform.position, castRadius, Vector3.down, out RaycastHit ground, dist, GroundLayer)) {
             GroundCollision = false;
             return;
         }
@@ -214,8 +215,7 @@ public class PlayerMovement : Player.PlayerComponent
                 GroundNormal = Vector3.up;
             }
         }
-        else
-        {
+        else {
             WalkingOffGround = true;
             GroundNormal = Vector3.up;
         }
@@ -251,8 +251,6 @@ public class PlayerMovement : Player.PlayerComponent
     private class WalkingState : State<PlayerMovement>
     {
         // Variables can be put in the states, they cannot be accessed by the hfsm!
-        private Vector3 stickVel;
-
         // Constructor, if you're making your own state just duplicate this and change the name from WalkingState to whatever it is you want it to be called :)
         public WalkingState(PlayerMovement context) : base(context) { }
 
@@ -270,11 +268,10 @@ public class PlayerMovement : Player.PlayerComponent
             float halfSize    = 1;
             float yPos        = context.rb.transform.position.y - halfSize - context.GroundPoint.y;
             float yCheck      = context.FLOOR_STICK_THRESHOLD;
-            Vector3 targetPos = new(context.rb.transform.position.x, context.GroundPoint.y + halfSize, context.rb.transform.position.z);
 
-            if (yPos > yCheck) {
-                Vector3 currentPos = Vector3.SmoothDamp(context.rb.transform.position, targetPos, ref stickVel, context.floorStickTime, Mathf.Infinity, Time.fixedDeltaTime);
-                context.rb.MovePosition(currentPos);
+            if (yPos > yCheck && !context.WalkingOffGround) {
+                Vector3 targetPos = new(context.rb.transform.position.x, context.GroundPoint.y + halfSize, context.rb.transform.position.z);
+                context.rb.MovePosition(targetPos);
             }
 
             if (!context.SlopeCollision && !context.WalkingOffGround) context.SetY(0);
@@ -282,8 +279,7 @@ public class PlayerMovement : Player.PlayerComponent
         }
 
         // Called when the state is changed
-        public override void Exit() {
-        }
+        public override void Exit() { }
     }
 
     // Same applies to this as above
@@ -333,62 +329,66 @@ public class PlayerMovement : Player.PlayerComponent
 
             if (context.fsm.PreviousState == context.Walking && context.rb.velocity.magnitude <= context.moveSpeed)
             {
-                Vector3 boost = context.MoveDir * context.rollBoostForce;
+                Vector3 dir   = context.PlayerInput.Inputting ? context.MoveDir.normalized : context.PlayerCamera.Camera.transform.forward;
+                Vector3 boost = context.rollBoostForce * dir;
 
                 context.rb.velocity        += boost;
                 context.HorizontalVelocity += new Vector2(boost.x, boost.z);
 
-                context.PlayerCamera.AddFOV(context.rollBoostFOV);
+                context.PlayerCamera.AddFOV(context.PlayerCamera.rollBoostFOV);
             }
         }
 
         public override void Update()
         {
-            Collider[] colliders = Physics.OverlapSphere(context.rb.position, context.SphereCollider.radius + 0.01f, context.PlayerLayer);
-
-            foreach (var collider in colliders)
-            {
-                if (collider.TryGetComponent<Launchable>(out Launchable p)) {
-                    p.Launch(context.rb.position);
-                }
-            }
-
-            if (context.PlayerInput.Inputting)
-            {
-                Vector3 currentVel = context.rb.velocity;
-
-                if (currentVel.magnitude < context.rollIdleSpeed) {
-                    if (currentVel.magnitude <= Mathf.Epsilon) {
-                        currentVel = context.MoveDir.normalized;
-                    }
-
-                    currentVel = currentVel.normalized * context.rollIdleSpeed;
-                }
-
-                Quaternion rotation   = Quaternion.FromToRotation(currentVel.normalized, context.MoveDir);
-                Vector3    rotatedVel = rotation * currentVel;
-                rotatedVel.y = 0;
-
-                Vector3 desiredVel  = Vector3.MoveTowards(currentVel, rotatedVel, Time.deltaTime * context.rollRotationSpeed);
-                desiredVel.y        = context.rb.velocity.y;
-                context.rb.velocity = desiredVel;
-            }
-
             if (context.PlayerInput.Jump.Pressed) {
                 context.jumpBuffer = context.jumpBufferTime;
             }
 
-            if (context.GroundCollision) {
-                if (context.jumpBuffer > 0) {
-                    context.SetY(context.rollJumpForce);
+            context.PlayerCamera.SetBoxBoundBottom();
+            context.PlayerCamera.AddFOV(context.rb.velocity.magnitude / context.PlayerCamera.rollFOVReduction);
+        }
+
+        public override void FixedUpdate()
+        {
+            Collider[] colliders = Physics.OverlapSphere(context.rb.position, context.SphereCollider.radius + 0.01f, context.PlayerLayer);
+
+            foreach (var collider in colliders)
+            {
+                if (collider.TryGetComponent<Launchable>(out Launchable p))
+                {
+                    p.Launch(context.rb.position);
                 }
             }
 
-            context.PlayerCamera.SetBoxBoundBottom();
-            context.PlayerCamera.AddFOV(context.rb.velocity.magnitude / context.rollFOVReduction);
-        }
+            if (Physics.SphereCast(context.rb.position, 1.5f, context.MomentumNoY.normalized, out RaycastHit hit, context.SphereCollider.radius + 0.1f, context.GroundLayer))
+            {
+                if (hit.rigidbody == null && Vector3.Angle(Vector3.up, hit.normal) >= context.rollMinBounceAngle)
+                {
+                    Vector3 rotatedVel  = Vector3.Reflect(context.rb.velocity, hit.normal);
+                    rotatedVel.y        = 0;
+                    rotatedVel          = rotatedVel.normalized * context.rb.velocity.magnitude;
+                    context.rb.velocity = rotatedVel;
+                }
+            }
 
-        public override void FixedUpdate() => context.ApplyGravity();
+            if (context.GroundCollision && context.jumpBuffer > 0) {
+                context.SetY(context.rollJumpForce);
+            }
+
+            context.ApplyGravity();
+
+            if (context.PlayerInput.Inputting)
+            {
+                Vector3 currentVel  = context.MomentumNoY.normalized;
+                Vector3 targetVel   = context.MoveDir.normalized;
+                Vector3 newVel      = Vector3.RotateTowards(currentVel, targetVel, context.rollRotationSpeed * Time.deltaTime, 0f);
+
+                newVel   = newVel.normalized * context.MomentumNoY.magnitude;
+                newVel.y = context.rb.velocity.y;
+                context.rb.velocity = newVel;
+            }
+        }
 
         public override void Exit()
         {
@@ -409,8 +409,7 @@ public class PlayerMovement : Player.PlayerComponent
         public override void Enter()
         {
             float   normalAngle  = Repeat(Vector3.SignedAngle(context.WallNormal, Vector3.forward, Vector3.up) + 90.0f);
-
-            Vector3 reflect      = Vector3.Reflect(context.MoveDir.normalized, context.WallNormal).normalized;
+            Vector3 reflect      = Vector3.Reflect(context.MoveDir, context.WallNormal).normalized;
             float   reflectAngle = Repeat(Vector3.SignedAngle(reflect, Vector3.forward, Vector3.up) + 90.0f);
 
             float min = Repeat(normalAngle - context.wallJumpAngle);
@@ -425,7 +424,7 @@ public class PlayerMovement : Player.PlayerComponent
             Vector3 dir   = new Vector3(Mathf.Cos(Mathf.Deg2Rad * reflectAngle), 0, Mathf.Sin(Mathf.Deg2Rad * reflectAngle)).normalized;
             Vector3 force = dir.normalized * context.wallJumpForce;
 
-            context.rb.velocity += force;
+            context.rb.velocity       += force;
             context.HorizontalVelocity = new Vector2(context.rb.velocity.x, context.rb.velocity.z);
 
             context.SetY(context.wallJumpHeight);
@@ -434,24 +433,17 @@ public class PlayerMovement : Player.PlayerComponent
             context.PlayerCamera.SetBoxBoundBottom();
         }
 
-        public override void FixedUpdate()
-        {
-            context.ApplyGravity();
-        }
+        public override void FixedUpdate() => context.ApplyGravity();
 
-        private float Repeat(float value)
-        {
+        private float Repeat(float value) {
             return Mathf.Repeat(value, 360.0f);
         }
 
-        private bool IsInRange(float reflectedNormal, float min, float max)
-        {
-            if (min < max)
-            {
+        private bool IsInRange(float reflectedNormal, float min, float max) {
+            if (min < max) {
                 return reflectedNormal >= min && reflectedNormal <= max;
             }
-            else
-            {
+            else {
                 return reflectedNormal >= min || reflectedNormal <= max;
             }
         }

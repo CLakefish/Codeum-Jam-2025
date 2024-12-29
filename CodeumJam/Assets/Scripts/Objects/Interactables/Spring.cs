@@ -13,11 +13,14 @@ public class Spring : MonoBehaviour
         if (other.transform.parent != null && other.transform.parent.TryGetComponent(out PlayerMovement movement)) {
             movement.Launch(Vector3.up * verticalForce);
         }
+        else {
+            other.attachedRigidbody.velocity += Vector3.up * verticalForce;
+        }
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawRay(transform.position, Vector3.up * verticalForce);
+        Gizmos.DrawRay(transform.position, (Vector3.up * verticalForce).normalized);
     }
 }

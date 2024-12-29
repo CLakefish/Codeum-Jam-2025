@@ -12,7 +12,6 @@ public class PlayerCamera : Player.PlayerComponent
     [SerializeField] private GameObject orbModel;
 
     [Header("Camera")]
-    [SerializeField] private Camera cam;
     [SerializeField] private Transform pivot;
     [SerializeField] private float FOV;
 
@@ -25,12 +24,18 @@ public class PlayerCamera : Player.PlayerComponent
     [SerializeField] private float distance, yOffset;
     [SerializeField] private Vector3 boxSize;
 
+    [Header("VFX")]
+    [SerializeField] public float rollBoostFOV;
+    [SerializeField] public float rollFOVReduction;
+
     private Vector2 targetRotation;
     private Vector2 currentRotation;
     private Vector2 rotationVelocity;
     private Vector3 boxPosition;
     private float currentFOV;
     private float yVel, fovVel;
+
+    public bool canRotate = true;
 
     private void Start() {
         boxPosition = rb.transform.position + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
@@ -43,29 +48,23 @@ public class PlayerCamera : Player.PlayerComponent
     {
         BoxBoundCheck();
 
-        // Rotations
-        targetRotation.y += PlayerInput.AlteredMouseDelta.x;
-        targetRotation.x -= PlayerInput.AlteredMouseDelta.y;
-        targetRotation.x = Mathf.Clamp(targetRotation.x, -89f, 89f);
+        if (canRotate)
+        {
+            // Rotations
+            targetRotation.y += PlayerInput.AlteredMouseDelta.x;
+            targetRotation.x -= PlayerInput.AlteredMouseDelta.y;
+            targetRotation.x = Mathf.Clamp(targetRotation.x, -89f, 89f);
 
-        currentRotation = new Vector2(
-            Mathf.SmoothDampAngle(currentRotation.x, targetRotation.x, ref rotationVelocity.x, rotationSmoothing),
-            Mathf.SmoothDampAngle(currentRotation.y, targetRotation.y, ref rotationVelocity.y, rotationSmoothing));
+            currentRotation = new Vector2(
+                Mathf.SmoothDampAngle(currentRotation.x, targetRotation.x, ref rotationVelocity.x, rotationSmoothing),
+                Mathf.SmoothDampAngle(currentRotation.y, targetRotation.y, ref rotationVelocity.y, rotationSmoothing));
 
-        pivot.eulerAngles = new Vector3(currentRotation.x, currentRotation.y, 0f);
-
-        // Collisions
-        float maxDist = distance;
-
-        if (Physics.SphereCast(pivot.position, spherecastRadius, -pivot.forward, out RaycastHit hit, distance, GroundLayer)) {
-            maxDist = (hit.point - pivot.position).magnitude - spherecastRadius;
+            pivot.eulerAngles = new Vector3(currentRotation.x, currentRotation.y, 0f);
         }
 
-        // Positions
-        cam.transform.localPosition = Vector3.forward * -(maxDist - spherecastRadius);
-        pivot.position              = boxPosition - (Vector3.up * yOffset);
+        CheckDist();
 
-        cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, currentFOV, ref fovVel, FOVInterpolation);
+        Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, currentFOV, ref fovVel, FOVInterpolation);
     }
 
     private void OnDrawGizmos()
@@ -78,6 +77,19 @@ public class PlayerCamera : Player.PlayerComponent
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(boxPosition, boxSize);
+    }
+
+    public void CheckDist()
+    {
+        float maxDist = distance;
+
+        if (Physics.SphereCast(pivot.position, spherecastRadius, -pivot.forward, out RaycastHit hit, distance, GroundLayer)) {
+            maxDist = (hit.point - pivot.position).magnitude - spherecastRadius;
+        }
+
+        // Positions
+        Camera.transform.localPosition = Vector3.forward * -(maxDist - spherecastRadius);
+        pivot.position = boxPosition - (Vector3.up * yOffset);
     }
 
     private void BoxBoundCheck()
@@ -93,7 +105,6 @@ public class PlayerCamera : Player.PlayerComponent
         }
 
         if (Mathf.Abs(dir.z) > boxSize.z / 2.0f) boxPosition.z = rb.transform.position.z - Mathf.Sign(dir.z) * (boxSize.z / 2.0f);
-
     }
 
     public void SetBoxBoundBottom()

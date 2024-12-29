@@ -7,10 +7,16 @@ public class ParticleFollow : MonoBehaviour
     private Transform camTransform;
 
     private void Start() {
-        camTransform = Camera.main.transform;
+        if (Camera.main != null) camTransform = Camera.main.transform;
     }
 
-    private void Update() {
+    private void LateUpdate() {
+        if (camTransform == null) {
+            if (Camera.main == null) return;
+
+            camTransform = Camera.main.transform;
+        }
+
         Vector3 camPos     = camTransform.position;
         transform.position = new Vector3(camPos.x, transform.position.y, camPos.z);
     }

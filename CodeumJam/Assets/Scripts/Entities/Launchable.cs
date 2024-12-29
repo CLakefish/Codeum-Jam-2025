@@ -1,34 +1,48 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class Launchable : MonoBehaviour
+public class Launchable : Resettable
 {
+    [Header("On Launch Event")]
+    [SerializeField] protected UnityEvent onLaunch;
+
     [Header("Launcing Parameters")]
     [SerializeField] private float launchForce;
     [SerializeField] private float heightForce;
-    [SerializeField] private float gravityForce;
+    [SerializeField] private float gravityForce = 48.0f;
+    [SerializeField] protected Rigidbody rb;
+    private Vector3 startPosition;
+    private Quaternion startRotation;
 
-    [Header("References")]
-    [SerializeField] private Rigidbody rb;
+    private void Awake() {
+        rb.freezeRotation = true;
 
-    private bool isLaunched = false;
+        startPosition = rb.position;
+        startRotation = rb.rotation;
+    }
 
-    public void Launch(Vector3 position)
-    {
-        isLaunched = true;
+    private void FixedUpdate() {
+        rb.velocity -= gravityForce * Time.fixedDeltaTime * Vector3.up;
+    }
+
+    public override void OnReset() {
+        rb.velocity = Vector3.zero;
+        rb.position = startPosition;
+        rb.rotation = startRotation;
+
+        rb.freezeRotation = true;
+        base.OnReset();
+    }
+
+    public virtual void Launch(Vector3 position) {
+        onLaunch?.Invoke();
         rb.freezeRotation = false;
 
         Vector3 dir = (transform.position - position).normalized;
         rb.velocity = dir * launchForce + (Vector3.up * heightForce);
 
         rb.AddTorque(dir, ForceMode.VelocityChange);
-    }
-
-    private void FixedUpdate()
-    {
-        if (!isLaunched) return;
-
-        rb.velocity -= Vector3.up * gravityForce * Time.fixedDeltaTime;
     }
 }

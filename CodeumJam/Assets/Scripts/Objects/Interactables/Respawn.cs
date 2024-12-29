@@ -36,6 +36,20 @@ public class Respawn : MonoBehaviour
     {
         if (other.attachedRigidbody == null) return;
 
-        other.transform.position = spawnPosition;
+        switch (other.gameObject.tag)
+        {
+            case "Player":
+                LevelManager.Instance.ResetAll();
+                other.transform.position = spawnPosition;
+                break;
+
+            case "Collidable":
+                other.gameObject.SetActive(false);
+                break;
+
+            default:
+                other.transform.position = spawnPosition;
+                break;
+        }
     }
 }
