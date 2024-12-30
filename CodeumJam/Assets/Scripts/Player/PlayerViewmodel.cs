@@ -44,7 +44,7 @@ public class PlayerViewmodel : Player.PlayerComponent
 
         if (!IsSnowman || !canRotate) return;
 
-        float yAngleOffset = Mathf.Atan2(Camera.transform.forward.z, Camera.transform.forward.x) * Mathf.Rad2Deg - 90f;
+        float yAngleOffset = Mathf.Atan2(Camera.transform.forward.z, Camera.transform.forward.x) * Mathf.Rad2Deg - (90f - player.transform.eulerAngles.y);
 
         if (PlayerInput.Inputting) {
             float newAngle    = (Mathf.Atan2(PlayerInput.Inputs.normalized.x, PlayerInput.Inputs.normalized.y) * Mathf.Rad2Deg) - yAngleOffset;

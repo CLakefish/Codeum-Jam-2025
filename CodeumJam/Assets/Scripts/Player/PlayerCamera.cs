@@ -59,7 +59,7 @@ public class PlayerCamera : Player.PlayerComponent
             Mathf.SmoothDampAngle(currentRotation.x, targetRotation.x, ref rotationVelocity.x, rotationSmoothing),
             Mathf.SmoothDampAngle(currentRotation.y, targetRotation.y, ref rotationVelocity.y, rotationSmoothing));
 
-        pivot.eulerAngles = new Vector3(currentRotation.x, currentRotation.y, 0f);
+        pivot.eulerAngles = new Vector3(currentRotation.x + player.transform.eulerAngles.x, currentRotation.y + player.transform.eulerAngles.y, player.transform.eulerAngles.z);
 
         CheckDist();
 

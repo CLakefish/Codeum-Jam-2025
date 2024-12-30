@@ -6,7 +6,8 @@ public class LevelManager : MonoBehaviour
 {
     public static LevelManager Instance;
 
-    [SerializeField] public CutsceneManager cutsceneManager;
+    [SerializeField] public CutsceneManager       cutsceneManager;
+    [SerializeField] public LevelScriptableObject levelScriptableObject;
 
     private readonly HashSet<Resettable> resettables           = new();
     private readonly HashSet<PointOfInterest> pointsOfInterest = new();
@@ -19,6 +20,7 @@ public class LevelManager : MonoBehaviour
 
     private void Start() {
         cutsceneManager.TriggerCutscene(CutsceneManager.CutsceneType.Intro);
+        cutsceneManager.ChangeScene += () => levelScriptableObject.ChangeScene();
     }
 
     private void OnDrawGizmos()

@@ -191,8 +191,7 @@ public class PlayerMovement : Player.PlayerComponent
 
     private void SetY(float y)  => rb.velocity = new Vector3(rb.velocity.x, y, rb.velocity.z);
     private void ApplyGravity() => rb.velocity -= gravityForce * Time.fixedDeltaTime * Vector3.up;
-    private void Move(bool maintainMomentum = true)
-    {
+    private void Move(bool maintainMomentum = true) {
         float speed = maintainMomentum
             ? Mathf.Max(moveSpeed, new Vector2(rb.velocity.x, rb.velocity.z).magnitude)
             : moveSpeed;
@@ -216,14 +215,15 @@ public class PlayerMovement : Player.PlayerComponent
         SetY(force.y);
         HorizontalVelocity += new Vector2(force.x, force.z);
 
-        if (fsm.CurrentState != Rolling) fsm.ChangeState(Falling);
+        if (fsm.CurrentState != Rolling) {
+            fsm.ChangeState(Falling);
+        }
 
         GroundCollision = false;
         Launched = true;
     }
 
-    private void CheckGroundCollisions()
-    {
+    private void CheckGroundCollisions() {
         float dist = fsm.CurrentState == Walking ? groundCastDist : fallCastDist;
 
         if (!Physics.SphereCast(rb.transform.position, castRadius, Vector3.down, out RaycastHit ground, dist, GroundLayer)) {
@@ -233,8 +233,7 @@ public class PlayerMovement : Player.PlayerComponent
 
         Vector3 dir = new Vector3(Mathf.Sign(rb.velocity.x), 0, Mathf.Sign(rb.velocity.z)).normalized * (castRadius / CORRECTION_RAD_REDUCT);
 
-        if (Physics.Raycast(rb.transform.position + dir, Vector3.down, out RaycastHit nonInterpolated, CORRECTION_DIST, GroundLayer))
-        {
+        if (Physics.Raycast(rb.transform.position + dir, Vector3.down, out RaycastHit nonInterpolated, CORRECTION_DIST, GroundLayer)) {
             WalkingOffGround = false;
 
             if (Vector3.Angle(Vector3.up, nonInterpolated.normal) < 90) {
@@ -257,16 +256,14 @@ public class PlayerMovement : Player.PlayerComponent
         Launched = false;
     }
 
-    private void CheckWallCollisions()
-    {
+    private void CheckWallCollisions() {
         float PISQR = Mathf.PI * 2.0f / wallCastIncrement;
 
         for (int i = 0; i < wallCastIncrement; i++) {
             Vector3 dir = new Vector3(Mathf.Cos(PISQR * i), 0, Mathf.Sin(PISQR * i)).normalized;
             Debug.DrawRay(rb.transform.position, dir);
 
-            if (Physics.Raycast(rb.transform.position, dir, out RaycastHit hit, wallCastDistance, GroundLayer))
-            {
+            if (Physics.Raycast(rb.transform.position, dir, out RaycastHit hit, wallCastDistance, GroundLayer)) {
                 WallCollision = true;
                 WallNormal    = hit.normal;
                 return;
@@ -287,15 +284,13 @@ public class PlayerMovement : Player.PlayerComponent
 
         // Called when state is first created
         // Ensure its marked as "public override void" rather than "public void", else it will not function!
-
         // Called every update call (done via fsm.Update())
         public override void Update() {
             context.PlayerCamera.SetBoxBoundBottom();
         }
 
         // Called every fixed update call (done via fsm.FixedUpdate())
-        public override void FixedUpdate()
-        {
+        public override void FixedUpdate() {
             float halfSize    = 1;
             float yPos        = context.rb.transform.position.y - halfSize - context.GroundPoint.y;
             float yCheck      = context.FLOOR_STICK_THRESHOLD;
@@ -305,7 +300,9 @@ public class PlayerMovement : Player.PlayerComponent
                 context.rb.MovePosition(targetPos);
             }
 
-            if (!context.SlopeCollision && !context.WalkingOffGround) context.SetY(0);
+            if (!context.SlopeCollision && !context.WalkingOffGround) {
+                context.SetY(0);
+            }
             context.Move(context.fsm.Duration < context.momentumConserveTimeGround);
         }
 
@@ -318,8 +315,7 @@ public class PlayerMovement : Player.PlayerComponent
     {
         public JumpingState(PlayerMovement context) : base(context) { }
 
-        public override void Enter()
-        {
+        public override void Enter() {
             context.SetY(context.jumpForce);
             context.jumpBuffer = 0;
         }
@@ -334,8 +330,7 @@ public class PlayerMovement : Player.PlayerComponent
     {
         public FallingState(PlayerMovement context) : base(context) { }
 
-        public override void Update()
-        {
+        public override void Update() {
             if (context.PlayerInput.Jump.Pressed) {
                 context.jumpBuffer = context.jumpBufferTime;
             }
@@ -360,8 +355,7 @@ public class PlayerMovement : Player.PlayerComponent
             float min = Repeat(normalAngle - context.wallJumpAngle);
             float max = Repeat(normalAngle + context.wallJumpAngle);
 
-            if (!IsInRange(reflectAngle, min, max))
-            {
+            if (!IsInRange(reflectAngle, min, max)) {
                 bool minLarger = Mathf.Abs(reflectAngle - min) > Mathf.Abs(reflectAngle - max);
                 reflectAngle = minLarger ? max : min;
             }
@@ -380,19 +374,15 @@ public class PlayerMovement : Player.PlayerComponent
 
         public override void FixedUpdate() => context.ApplyGravity();
 
-        private float Repeat(float value)
-        {
+        private float Repeat(float value) {
             return Mathf.Repeat(value, 360.0f);
         }
 
-        private bool IsInRange(float reflectedNormal, float min, float max)
-        {
-            if (min < max)
-            {
+        private bool IsInRange(float reflectedNormal, float min, float max) {
+            if (min < max) {
                 return reflectedNormal >= min && reflectedNormal <= max;
             }
-            else
-            {
+            else {
                 return reflectedNormal >= min || reflectedNormal <= max;
             }
         }
@@ -402,15 +392,13 @@ public class PlayerMovement : Player.PlayerComponent
     {
         public RollingStateMachine(PlayerMovement context, StateMachine<PlayerMovement> parent) : base(context, parent) { }
 
-        public override void Enter()
-        {
+        public override void Enter() {
             context.CapsuleCollider.enabled = false;
             context.SphereCollider.enabled  = true;
 
             context.PlayerViewmodel.Rolling(true);
 
-            if (context.fsm.PreviousState == context.Walking && context.rb.velocity.magnitude <= context.moveSpeed)
-            {
+            if (context.fsm.PreviousState == context.Walking && context.rb.velocity.magnitude <= context.moveSpeed) {
                 Vector3 dir = context.PlayerInput.Inputting ? context.MoveDir : context.PlayerCamera.Camera.transform.forward;
                 Vector3 boost = context.rollBoostForce * dir;
 
@@ -421,8 +409,7 @@ public class PlayerMovement : Player.PlayerComponent
             }
         }
 
-        public override void Update()
-        {
+        public override void Update() {
             CheckTransitions();
 
             context.PlayerCamera.SetBoxBoundBottom();
@@ -431,22 +418,17 @@ public class PlayerMovement : Player.PlayerComponent
             base.Update();
         }
 
-        public override void FixedUpdate()
-        {
+        public override void FixedUpdate() {
             Collider[] colliders = Physics.OverlapSphere(context.rb.position, context.SphereCollider.radius + 0.01f, context.PlayerLayer);
 
-            foreach (var collider in colliders)
-            {
-                if (collider.TryGetComponent<Launchable>(out Launchable p))
-                {
+            foreach (var collider in colliders) {
+                if (collider.TryGetComponent<Launchable>(out Launchable p)) {
                     p.Launch(context.rb.position);
                 }
             }
 
-            if (Physics.SphereCast(context.rb.position, context.SphereCollider.radius, context.MomentumNoY.normalized, out RaycastHit hit, context.rollBounceCastDistance, context.GroundLayer))
-            {
-                if (hit.rigidbody == null && Vector3.Angle(Vector3.up, hit.normal) >= context.rollMinBounceAngle)
-                {
+            if (Physics.SphereCast(context.rb.position, context.SphereCollider.radius, context.MomentumNoY.normalized, out RaycastHit hit, context.rollBounceCastDistance, context.GroundLayer)) {
+                if (hit.rigidbody == null && Vector3.Angle(Vector3.up, hit.normal) >= context.rollMinBounceAngle) {
                     Vector3 rotatedVel = Vector3.Reflect(context.rb.velocity, hit.normal);
                     rotatedVel.y = 0;
                     rotatedVel = rotatedVel.normalized * context.rb.velocity.magnitude;
@@ -454,8 +436,7 @@ public class PlayerMovement : Player.PlayerComponent
                 }
             }
 
-            if (context.PlayerInput.Inputting)
-            {
+            if (context.PlayerInput.Inputting) {
                 Vector3 currentVel = context.MomentumNoY.normalized;
                 Vector3 targetVel = context.MoveDir;
                 Vector3 newVel = Vector3.RotateTowards(currentVel, targetVel, context.rollRotationSpeed * Time.deltaTime, 0f);
@@ -470,8 +451,7 @@ public class PlayerMovement : Player.PlayerComponent
             base.FixedUpdate();
         }
 
-        public override void Exit()
-        {
+        public override void Exit() {
             context.CapsuleCollider.enabled = true;
             context.SphereCollider.enabled = false;
 
@@ -493,8 +473,10 @@ public class PlayerMovement : Player.PlayerComponent
         public RollingJumpState(PlayerMovement context) : base(context) { }
 
         public override void Enter() {
-            if (context.rb.velocity.y <= 0 || context.Launched) context.SetY(context.rollJumpForce);
-            else context.rb.velocity += Vector3.up * context.rollJumpForce;
+            if (context.rb.velocity.y <= context.rollJumpForce) {
+                context.SetY(context.rollJumpForce);
+            }
+            context.Launched = false;
         }
     }
 
@@ -502,8 +484,7 @@ public class PlayerMovement : Player.PlayerComponent
     {
         public RollingFallState(PlayerMovement context) : base(context) { }
 
-        public override void Update()
-        {
+        public override void Update() {
             if (context.PlayerInput.Jump.Pressed) {
                 context.jumpBuffer = context.jumpBufferTime;
             }

@@ -12,7 +12,8 @@ public class CutsceneManager : MonoBehaviour
     [Header("Camera")]
     [SerializeField] private List<Transform> introPositions;
     [SerializeField] private Transform endPosition;
-    [SerializeField] private GameObject player;
+    [SerializeField] private Camera playerCamera;
+    [SerializeField] private Player player;
 
     [Header("Intro")]
     [SerializeField] private string levelName;
@@ -25,38 +26,41 @@ public class CutsceneManager : MonoBehaviour
     [SerializeField] private float interpolationSpeed;
     [SerializeField] private float positionThreshold;
 
+    public event System.Action IntroCutsceneTrigger;
+    public event System.Action EndCutsceneTrigger;
+    public event System.Action ChangeScene;
+
     private CutsceneType cutsceneType;
-    private Coroutine cutscene;
+    private Coroutine    cutscene;
 
-    public System.Action IntroCutsceneTrigger;
-    public System.Action EndCutsceneTrigger;
+    private void Awake() {
+        playerCamera.transform.position = introPositions[0].position;
+        playerCamera.transform.forward  = introPositions[0].forward;
+    }
 
-    private void Update()
-    {
+    private void Update() {
         if (Input.GetKeyDown(KeyCode.Space) && cutscene != null) {
-            StopCoroutine(cutscene);
-            EnablePlayer(true);
-
             switch (cutsceneType) { 
                 case CutsceneType.Intro:
                     IntroCutsceneTrigger?.Invoke();
+                    StopCoroutine(cutscene);
+                    EnablePlayer(true);
+
+                    Transform viewCamera = Camera.main.transform;
+                    viewCamera.transform.localPosition = Vector3.zero;
+                    viewCamera.transform.localRotation = Quaternion.identity;
                     break;
 
                 case CutsceneType.End:
-                    IntroCutsceneTrigger?.Invoke();
+                    EndCutsceneTrigger?.Invoke();
+                    ChangeScene?.Invoke();
                     break;
             }
-
-            Transform viewCamera = Camera.main.transform;
-            viewCamera.transform.localPosition = Vector3.zero;
-            viewCamera.transform.localRotation = Quaternion.identity;
-
             cutscene = null;
         }
     }
 
-    private void OnDrawGizmos()
-    {
+    private void OnDrawGizmos() {
         if (introPositions != null) {
             for (int i = 0; i < introPositions.Count; ++i) {
                 if (i > 0) {
@@ -82,12 +86,10 @@ public class CutsceneManager : MonoBehaviour
     }
 
     private void EnablePlayer(bool allow) {
-        Player p = player.GetComponent<Player>();
-        p.AllowMovement(allow);
+        player.AllowMovement(allow);
     }
 
-    public void TriggerCutscene(CutsceneType cutsceneType)
-    {
+    public void TriggerCutscene(CutsceneType cutsceneType) {
         if (cutscene != null) StopCoroutine(cutscene);
         this.cutsceneType = cutsceneType;
 
