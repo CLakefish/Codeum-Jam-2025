@@ -28,6 +28,8 @@ public class PlayerCamera : Player.PlayerComponent
     [SerializeField] public float rollBoostFOV;
     [SerializeField] public float rollFOVReduction;
 
+    public Transform Pivot => pivot;
+
     private Vector2 targetRotation;
     private Vector2 currentRotation;
     private Vector2 rotationVelocity;

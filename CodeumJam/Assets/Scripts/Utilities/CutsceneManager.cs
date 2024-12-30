@@ -104,7 +104,8 @@ public class CutsceneManager : MonoBehaviour
     public void TriggerCutscene(CutsceneType cutsceneType) {
         if (cutscene != null) StopCoroutine(cutscene);
         this.cutsceneType = cutsceneType;
-        CutscenePlaying   = true;
+        EnablePlayer(false);
+        CutscenePlaying = true;
 
         switch (cutsceneType) {
             case CutsceneType.Intro:
@@ -118,53 +119,50 @@ public class CutsceneManager : MonoBehaviour
     }
 
     private IEnumerator IntroCutscene() {
-        Transform viewCamera = Camera.main.transform;
-        Transform camParent  = Camera.main.transform.parent;
-
-        viewCamera.transform.position = introPositions[0].position;
-        viewCamera.transform.forward  = introPositions[0].forward;
+        playerCamera.transform.position = introPositions[0].position;
+        playerCamera.transform.forward  = introPositions[0].forward;
 
         Vector3 positionVelocity = Vector3.zero;
         Vector3 rotationVelocity = Vector3.zero;
 
-        EnablePlayer(false);
         IntroCutsceneTrigger?.Invoke();
 
         for (int i = 0; i < introPositions.Count; ++i) {
-            while (Vector3.Distance(viewCamera.transform.position, introPositions[i].position) > positionThreshold) {
-                viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, introPositions[i].position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
-                viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward,  introPositions[i].forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+            while (Vector3.Distance(playerCamera.transform.position, introPositions[i].position) > positionThreshold) {
+                playerCamera.transform.position = Vector3.SmoothDamp(playerCamera.transform.position, introPositions[i].position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+                playerCamera.transform.forward  = Vector3.SmoothDamp(playerCamera.transform.forward,  introPositions[i].forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
                 yield return null;
             }
 
-            viewCamera.transform.position = introPositions[i].position;
-            viewCamera.transform.forward  = introPositions[i].forward;
+            playerCamera.transform.position = introPositions[i].position;
+            playerCamera.transform.forward  = introPositions[i].forward;
         }
 
-        while (Vector3.Distance(viewCamera.transform.position, camParent.position) > 0.01f) {
-            viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, camParent.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
-            viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward,  camParent.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+        Transform camParent = player.GetCamera().Pivot;
+
+        while (Vector3.Distance(playerCamera.transform.position, camParent.position) > 0.01f) {
+            playerCamera.transform.position = Vector3.SmoothDamp(playerCamera.transform.position, camParent.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+            playerCamera.transform.forward  = Vector3.SmoothDamp(playerCamera.transform.forward,  camParent.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
             yield return null;
         }
 
+        CutscenePlaying = false;
         EnablePlayer(true);
     }
 
     private IEnumerator EndCutscene() {
-        Transform viewCamera = Camera.main.transform;
-        EnablePlayer(false);
-
         Vector3 positionVelocity = Vector3.zero;
         Vector3 rotationVelocity = Vector3.zero;
 
         yield return new WaitForSeconds(endPause);
 
-        while (Vector3.Distance(viewCamera.transform.position, endPosition.position) > positionThreshold) {
-            viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, endPosition.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
-            viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward,  endPosition.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+        while (Vector3.Distance(playerCamera.transform.position, endPosition.position) > positionThreshold) {
+            playerCamera.transform.position = Vector3.SmoothDamp(playerCamera.transform.position, endPosition.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+            playerCamera.transform.forward  = Vector3.SmoothDamp(playerCamera.transform.forward,  endPosition.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
             yield return null;
         }
 
         EndCutsceneTrigger?.Invoke();
+        CutscenePlaying = false;
     }
 }
