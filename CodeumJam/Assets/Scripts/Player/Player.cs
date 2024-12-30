@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
     [Header("Player Components")]
     [SerializeField] private PlayerMovement  playerMovement;
     [SerializeField] private PlayerCamera    playerCamera;
-    [SerializeField] private PlayerInput     playerInput;
+    [SerializeField] protected PlayerInput     playerInput;
     [SerializeField] private PlayerViewmodel playerViewmodel;
 
     [Header("Player Physics")]
