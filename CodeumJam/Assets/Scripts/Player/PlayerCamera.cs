@@ -46,7 +46,8 @@ public class PlayerCamera : Player.PlayerComponent
 
     private void Update()
     {
-        if (!canRotate) return;
+        // Change this to a boolean in the menu
+        if (!canRotate || Time.timeScale == 0) return;
 
         BoxBoundCheck();
 

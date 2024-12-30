@@ -30,10 +30,15 @@ public class Player : MonoBehaviour
 
     public void AllowMovement(bool allow)
     {
+        if (CutsceneManager.Instance.CutscenePlaying) return;
         playerMovement.enabled    = allow;
-        playerCamera.canRotate    = allow;
-        playerCamera.SetParent(allow);
         playerViewmodel.canRotate = allow;
+    }
+
+    public void CutsceneCam(bool allow)
+    {
+        playerCamera.canRotate = allow;
+        playerCamera.SetParent(allow);
     }
 
     public class PlayerComponent : MonoBehaviour

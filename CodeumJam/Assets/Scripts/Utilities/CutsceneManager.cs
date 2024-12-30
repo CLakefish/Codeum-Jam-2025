@@ -9,6 +9,8 @@ public class CutsceneManager : MonoBehaviour
         End,
     }
 
+    public static CutsceneManager Instance { get; private set; }
+
     [Header("Camera")]
     [SerializeField] private List<Transform> introPositions;
     [SerializeField] private Transform endPosition;
@@ -30,8 +32,14 @@ public class CutsceneManager : MonoBehaviour
     public event System.Action EndCutsceneTrigger;
     public event System.Action ChangeScene;
 
+    public bool CutscenePlaying;
+
     private CutsceneType cutsceneType;
     private Coroutine    cutscene;
+
+    private void OnEnable() {
+        if (Instance == null) Instance = this;
+    }
 
     private void Awake() {
         playerCamera.transform.position = introPositions[0].position;
@@ -40,6 +48,8 @@ public class CutsceneManager : MonoBehaviour
 
     private void Update() {
         if (Input.GetKeyDown(KeyCode.Space) && cutscene != null) {
+            CutscenePlaying = false;
+
             switch (cutsceneType) { 
                 case CutsceneType.Intro:
                     IntroCutsceneTrigger?.Invoke();
@@ -56,6 +66,7 @@ public class CutsceneManager : MonoBehaviour
                     ChangeScene?.Invoke();
                     break;
             }
+
             cutscene = null;
         }
     }
@@ -87,11 +98,13 @@ public class CutsceneManager : MonoBehaviour
 
     private void EnablePlayer(bool allow) {
         player.AllowMovement(allow);
+        player.CutsceneCam(allow);
     }
 
     public void TriggerCutscene(CutsceneType cutsceneType) {
         if (cutscene != null) StopCoroutine(cutscene);
         this.cutsceneType = cutsceneType;
+        CutscenePlaying   = true;
 
         switch (cutsceneType) {
             case CutsceneType.Intro:
@@ -119,8 +132,8 @@ public class CutsceneManager : MonoBehaviour
 
         for (int i = 0; i < introPositions.Count; ++i) {
             while (Vector3.Distance(viewCamera.transform.position, introPositions[i].position) > positionThreshold) {
-                viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, introPositions[i].position, ref positionVelocity, interpolationSpeed);
-                viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward,  introPositions[i].forward,  ref rotationVelocity, interpolationSpeed);
+                viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, introPositions[i].position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+                viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward,  introPositions[i].forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
                 yield return null;
             }
 
@@ -129,8 +142,8 @@ public class CutsceneManager : MonoBehaviour
         }
 
         while (Vector3.Distance(viewCamera.transform.position, camParent.position) > 0.01f) {
-            viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, camParent.position, ref positionVelocity, interpolationSpeed);
-            viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward,  camParent.forward,  ref rotationVelocity, interpolationSpeed);
+            viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, camParent.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+            viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward,  camParent.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
             yield return null;
         }
 
@@ -147,8 +160,8 @@ public class CutsceneManager : MonoBehaviour
         yield return new WaitForSeconds(endPause);
 
         while (Vector3.Distance(viewCamera.transform.position, endPosition.position) > positionThreshold) {
-            viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, endPosition.position, ref positionVelocity, interpolationSpeed);
-            viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward,  endPosition.forward,  ref rotationVelocity, interpolationSpeed);
+            viewCamera.transform.position = Vector3.SmoothDamp(viewCamera.transform.position, endPosition.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+            viewCamera.transform.forward  = Vector3.SmoothDamp(viewCamera.transform.forward,  endPosition.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
             yield return null;
         }
 
