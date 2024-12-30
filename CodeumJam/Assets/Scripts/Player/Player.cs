@@ -4,24 +4,28 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public static Player Instance { get; private set; }
+
     [Header("Player Components")]
-    [SerializeField] private PlayerMovement  playerMovement;
-    [SerializeField] private PlayerCamera    playerCamera;
+    [SerializeField] private   PlayerMovement  playerMovement;
+    [SerializeField] private   PlayerCamera    playerCamera;
     [SerializeField] protected PlayerInput     playerInput;
-    [SerializeField] private PlayerViewmodel playerViewmodel;
+    [SerializeField] private   PlayerViewmodel playerViewmodel;
 
     [Header("Player Physics")]
-    [SerializeField] private Rigidbody rb;
+    [SerializeField] private Rigidbody       rb;
     [SerializeField] private CapsuleCollider capsuleCollider;
     [SerializeField] private SphereCollider  sphereCollider;
-    [SerializeField] private LayerMask groundLayer;
-    [SerializeField] private LayerMask playerLayer;
+    [SerializeField] private LayerMask       groundLayer;
+    [SerializeField] private LayerMask       playerLayer;
 
     [Header("Player Camera")]
     [SerializeField] private Camera cam;
 
     private void Awake()
     {
+        Instance = this;
+
         playerMovement.SetPlayer(this);
         playerCamera.SetPlayer(this);
         playerInput.SetPlayer(this);
@@ -39,6 +43,18 @@ public class Player : MonoBehaviour
     {
         playerCamera.canRotate = allow;
         playerCamera.SetParent(allow);
+    }
+
+    public PlayerMovement GetMovement() {
+        return playerMovement;
+    }
+
+    public PlayerInput GetInput() {
+        return playerInput;
+    }
+
+    public PlayerCamera GetCamera() {
+        return playerCamera;
     }
 
     public class PlayerComponent : MonoBehaviour
