@@ -13,10 +13,9 @@ GameObject:
   - component: {fileID: 7359697315128293483}
   - component: {fileID: 2535175420229512662}
   - component: {fileID: 3452762241806144513}
-  - component: {fileID: 8161536457190712201}
   m_Layer: 0
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: NoBounce
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -248,7 +247,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 2795
+  m_VersionIndex: 2798
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []
@@ -331,28 +330,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 62859481368561575}
   m_Mesh: {fileID: 0}
---- !u!64 &8161536457190712201
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 62859481368561575}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
 --- !u!1 &1263154954629341142
 GameObject:
   m_ObjectHideFlags: 0
@@ -370,7 +347,7 @@ GameObject:
   - component: {fileID: 6591973115742188519}
   m_Layer: 0
   m_Name: Spring
-  m_TagString: Untagged
+  m_TagString: NoBounce
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -605,7 +582,7 @@ MonoBehaviour:
   m_PreserveMeshAssetOnDestroy: 0
   assetGuid: 
   m_Mesh: {fileID: 0}
-  m_VersionIndex: 2733
+  m_VersionIndex: 2736
   m_IsSelectable: 1
   m_SelectedFaces: 
   m_SelectedEdges: []

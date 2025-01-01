@@ -40,7 +40,7 @@ public class Respawn : MonoBehaviour
         {
             case "Player":
                 LevelManager.Instance.ResetAll();
-                other.transform.position = spawnPosition;
+                other.attachedRigidbody.position = spawnPosition;
                 break;
 
             case "Collidable":

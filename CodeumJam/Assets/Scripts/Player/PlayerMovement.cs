@@ -42,10 +42,11 @@ public class PlayerMovement : Player.PlayerComponent
     [SerializeField] private float wallJumpTime;
     [SerializeField] private float wallJumpAngle;
 
-    private readonly float CORRECTION_DIST          = 1.75f;
-    private readonly float CORRECTION_RAD_REDUCT    = 4.0f;
-    private readonly float FLOOR_STICK_THRESHOLD    = 0.05f;
-    private readonly float JUMP_GRACE_TIME          = 0.1f;
+    private readonly float CORRECTION_DIST           = 1.75f;
+    private readonly float CORRECTION_RAD_REDUCT     = 4.0f;
+    private readonly float FLOOR_STICK_THRESHOLD     = 0.05f;
+    private readonly float FLOOR_STICK_INTERPOLATION = 0.1f;
+    private readonly float JUMP_GRACE_TIME           = 0.1f;
 
     private Vector3 MoveDir {
         get {
@@ -73,16 +74,31 @@ public class PlayerMovement : Player.PlayerComponent
     private RollingJumpState RollJump   { get; set; }
     private RollingFallState RollFall   { get; set; }
 
+    public bool IsRolling { 
+        get {
+            return fsm.CurrentState == Rolling;
+        }
+    }
 
-    private bool    GroundCollision  { get; set; }
-    private bool    SlopeCollision   { get; set; }
-    private bool    WalkingOffGround { get; set; }
-    private bool WallCollision       { get; set; }
-    private Vector3 GroundNormal     { get; set; }
-    private Vector3 GroundPoint      { get; set; }
+    public bool IsJumping {
+        get {
+            return fsm.CurrentState == Jumping;
+        }
+    }
+
+    public bool  GroundCollision  { get; set; }
+    private bool SlopeCollision   { get; set; }
+    private bool WalkingOffGround { get; set; }
+    private bool WallCollision    { get; set; }
+    public Vector3  GroundNormal     { get; set; }
+    public Vector3  GroundPoint      { get; set; }
     private Vector3 WallNormal       { get; set; }
 
-    private bool Launched { get; set; }
+
+    public event System.Action HitGround;
+    public event System.Action OnJump;
+    public event System.Action HitWall;
+
     private Vector2 HorizontalVelocity;
     private float jumpBuffer = 0;
 
@@ -220,7 +236,6 @@ public class PlayerMovement : Player.PlayerComponent
         }
 
         GroundCollision = false;
-        Launched = true;
     }
 
     private void CheckGroundCollisions() {
@@ -250,10 +265,8 @@ public class PlayerMovement : Player.PlayerComponent
 
         float angle     = Vector3.Angle(Vector3.up, GroundNormal);
         SlopeCollision  = angle > 0 && angle < 90;
-        GroundCollision = true;
         GroundPoint     = ground.point;
-
-        Launched = false;
+        GroundCollision = true;
     }
 
     private void CheckWallCollisions() {
@@ -278,9 +291,14 @@ public class PlayerMovement : Player.PlayerComponent
     // TL;DR everything can be private :)
     private class WalkingState : State<PlayerMovement>
     {
+        private Vector3 vel;
         // Variables can be put in the states, they cannot be accessed by the hfsm!
         // Constructor, if you're making your own state just duplicate this and change the name from WalkingState to whatever it is you want it to be called :)
         public WalkingState(PlayerMovement context) : base(context) { }
+
+        public override void Enter() {
+            context.HitGround?.Invoke();
+        }
 
         // Called when state is first created
         // Ensure its marked as "public override void" rather than "public void", else it will not function!
@@ -296,8 +314,9 @@ public class PlayerMovement : Player.PlayerComponent
             float yCheck      = context.FLOOR_STICK_THRESHOLD;
 
             if (yPos > yCheck && !context.WalkingOffGround) {
-                Vector3 targetPos = new(context.rb.transform.position.x, context.GroundPoint.y + halfSize, context.rb.transform.position.z);
-                context.rb.MovePosition(targetPos);
+                Vector3 targetPos  = new(context.rb.transform.position.x, context.GroundPoint.y + halfSize, context.rb.transform.position.z);
+                Vector3 currentPos = Vector3.SmoothDamp(context.rb.position, targetPos, ref vel, context.FLOOR_STICK_INTERPOLATION);
+                context.rb.MovePosition(currentPos);
             }
 
             if (!context.SlopeCollision && !context.WalkingOffGround) {
@@ -316,6 +335,7 @@ public class PlayerMovement : Player.PlayerComponent
         public JumpingState(PlayerMovement context) : base(context) { }
 
         public override void Enter() {
+            context.OnJump?.Invoke();
             context.SetY(context.jumpForce);
             context.jumpBuffer = 0;
         }
@@ -348,8 +368,8 @@ public class PlayerMovement : Player.PlayerComponent
 
         public override void Enter()
         {
-            float normalAngle = Repeat(Vector3.SignedAngle(context.WallNormal, Vector3.forward, Vector3.up) + 90.0f);
-            Vector3 reflect = Vector3.Reflect(context.MoveDir, context.WallNormal).normalized;
+            float normalAngle  = Repeat(Vector3.SignedAngle(context.WallNormal, Vector3.forward, Vector3.up) + 90.0f);
+            Vector3 reflect    = Vector3.Reflect(context.MoveDir, context.WallNormal).normalized;
             float reflectAngle = Repeat(Vector3.SignedAngle(reflect, Vector3.forward, Vector3.up) + 90.0f);
 
             float min = Repeat(normalAngle - context.wallJumpAngle);
@@ -360,7 +380,7 @@ public class PlayerMovement : Player.PlayerComponent
                 reflectAngle = minLarger ? max : min;
             }
 
-            Vector3 dir = new Vector3(Mathf.Cos(Mathf.Deg2Rad * reflectAngle), 0, Mathf.Sin(Mathf.Deg2Rad * reflectAngle)).normalized;
+            Vector3 dir   = new Vector3(Mathf.Cos(Mathf.Deg2Rad * reflectAngle), 0, Mathf.Sin(Mathf.Deg2Rad * reflectAngle)).normalized;
             Vector3 force = dir.normalized * context.wallJumpForce;
 
             context.rb.velocity += force;
@@ -398,7 +418,7 @@ public class PlayerMovement : Player.PlayerComponent
 
             context.PlayerViewmodel.Rolling(true);
 
-            if (context.fsm.PreviousState == context.Walking && context.rb.velocity.magnitude <= context.moveSpeed) {
+            if (context.MomentumNoY.magnitude <= context.moveSpeed) {
                 Vector3 dir = context.PlayerInput.Inputting ? context.MoveDir : context.PlayerCamera.Camera.transform.forward;
                 Vector3 boost = context.rollBoostForce * dir;
 
@@ -427,21 +447,25 @@ public class PlayerMovement : Player.PlayerComponent
                 }
             }
 
-            if (Physics.SphereCast(context.rb.position, context.SphereCollider.radius, context.MomentumNoY.normalized, out RaycastHit hit, context.rollBounceCastDistance, context.GroundLayer)) {
-                if (hit.rigidbody == null && Vector3.Angle(Vector3.up, hit.normal) >= context.rollMinBounceAngle) {
-                    Vector3 rotatedVel = Vector3.Reflect(context.rb.velocity, hit.normal);
-                    rotatedVel.y = 0;
-                    rotatedVel = rotatedVel.normalized * context.rb.velocity.magnitude;
+            if (Physics.SphereCast(context.rb.position, context.SphereCollider.radius - 0.01f, context.MomentumNoY.normalized, out RaycastHit hit, context.rollBounceCastDistance, context.GroundLayer)) {
+                float angle = Vector3.Angle(Vector3.up, hit.normal);
+
+                if (angle >= context.rollMinBounceAngle && !hit.collider.CompareTag("NoBounce")) {
+                    Vector3 rotatedVel  = Vector3.Reflect(context.rb.velocity, hit.normal);
+                    rotatedVel.y        = 0;
+                    rotatedVel          = rotatedVel.normalized * Mathf.Max(context.rb.velocity.magnitude, context.rollIdleSpeed);
                     context.rb.velocity = rotatedVel;
+
+                    context.HitWall?.Invoke();
                 }
             }
 
             if (context.PlayerInput.Inputting) {
                 Vector3 currentVel = context.MomentumNoY.normalized;
-                Vector3 targetVel = context.MoveDir;
-                Vector3 newVel = Vector3.RotateTowards(currentVel, targetVel, context.rollRotationSpeed * Time.deltaTime, 0f);
+                Vector3 targetVel  = context.MoveDir;
+                Vector3 newVel     = Vector3.RotateTowards(currentVel, targetVel, context.rollRotationSpeed * Time.deltaTime, 0f);
 
-                newVel = newVel.normalized * context.MomentumNoY.magnitude;
+                newVel   = newVel.normalized * context.MomentumNoY.magnitude;
                 newVel.y = context.rb.velocity.y;
                 context.rb.velocity = newVel;
             }
@@ -466,6 +490,10 @@ public class PlayerMovement : Player.PlayerComponent
     private class RollingWalkState : State<PlayerMovement>
     {
         public RollingWalkState(PlayerMovement context) : base(context) { }
+
+        public override void Enter() {
+            context.HitWall?.Invoke();
+        }
     }
 
     private class RollingJumpState : State<PlayerMovement>
@@ -473,10 +501,11 @@ public class PlayerMovement : Player.PlayerComponent
         public RollingJumpState(PlayerMovement context) : base(context) { }
 
         public override void Enter() {
+            context.OnJump?.Invoke();
+
             if (context.rb.velocity.y <= context.rollJumpForce) {
                 context.SetY(context.rollJumpForce);
             }
-            context.Launched = false;
         }
     }
 
