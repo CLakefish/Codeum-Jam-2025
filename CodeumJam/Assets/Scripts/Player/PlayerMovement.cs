@@ -47,6 +47,7 @@ public class PlayerMovement : Player.PlayerComponent
     private readonly float FLOOR_STICK_THRESHOLD     = 0.05f;
     private readonly float FLOOR_STICK_INTERPOLATION = 0.1f;
     private readonly float JUMP_GRACE_TIME           = 0.1f;
+    private readonly float CAMERA_CORRECT_THRESHOLD  = 0.1f;
 
     private Vector3 MoveDir {
         get {
@@ -93,6 +94,8 @@ public class PlayerMovement : Player.PlayerComponent
     public Vector3  GroundNormal     { get; set; }
     public Vector3  GroundPoint      { get; set; }
     private Vector3 WallNormal       { get; set; }
+
+    private Vector3 prevGroundPoint;
 
 
     public event System.Action HitGround;
@@ -304,7 +307,7 @@ public class PlayerMovement : Player.PlayerComponent
         // Ensure its marked as "public override void" rather than "public void", else it will not function!
         // Called every update call (done via fsm.Update())
         public override void Update() {
-            context.PlayerCamera.SetBoxBoundBottom();
+            context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.positionSmoothing);
         }
 
         // Called every fixed update call (done via fsm.FixedUpdate())
@@ -338,6 +341,15 @@ public class PlayerMovement : Player.PlayerComponent
             context.OnJump?.Invoke();
             context.SetY(context.jumpForce);
             context.jumpBuffer = 0;
+            context.prevGroundPoint = context.GroundPoint;
+        }
+
+        public override void Update() {
+            if (Physics.Raycast(context.rb.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, context.GroundLayer)) {
+                if (hit.point.y - context.prevGroundPoint.y > context.CAMERA_CORRECT_THRESHOLD) {
+                    context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.positionCorrectSpeed);
+                }
+            }
         }
 
         public override void FixedUpdate() {
@@ -350,9 +362,22 @@ public class PlayerMovement : Player.PlayerComponent
     {
         public FallingState(PlayerMovement context) : base(context) { }
 
+        public override void Enter()
+        {
+            context.prevGroundPoint = context.GroundPoint;
+        }
+
         public override void Update() {
             if (context.PlayerInput.Jump.Pressed) {
                 context.jumpBuffer = context.jumpBufferTime;
+            }
+
+            if (Physics.Raycast(context.rb.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, context.GroundLayer))
+            {
+                if (hit.point.y - context.prevGroundPoint.y > context.CAMERA_CORRECT_THRESHOLD)
+                {
+                    context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.positionCorrectSpeed);
+                }
             }
         }
 
@@ -368,6 +393,8 @@ public class PlayerMovement : Player.PlayerComponent
 
         public override void Enter()
         {
+            context.OnJump?.Invoke();
+
             float normalAngle  = Repeat(Vector3.SignedAngle(context.WallNormal, Vector3.forward, Vector3.up) + 90.0f);
             Vector3 reflect    = Vector3.Reflect(context.MoveDir, context.WallNormal).normalized;
             float reflectAngle = Repeat(Vector3.SignedAngle(reflect, Vector3.forward, Vector3.up) + 90.0f);
@@ -389,7 +416,7 @@ public class PlayerMovement : Player.PlayerComponent
             context.SetY(context.wallJumpHeight);
 
             context.jumpBuffer = 0;
-            context.PlayerCamera.SetBoxBoundBottom();
+            context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.positionSmoothing);
         }
 
         public override void FixedUpdate() => context.ApplyGravity();
@@ -432,7 +459,7 @@ public class PlayerMovement : Player.PlayerComponent
         public override void Update() {
             CheckTransitions();
 
-            context.PlayerCamera.SetBoxBoundBottom();
+            context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.positionSmoothing);
             context.PlayerCamera.AddFOV(context.rb.velocity.magnitude / context.PlayerCamera.rollFOVReduction);
 
             base.Update();

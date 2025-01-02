@@ -382,6 +382,7 @@ MonoBehaviour:
   snowMan: {fileID: 938944323205619726}
   snowBall: {fileID: 4604523423004037194}
   shadow: {fileID: 5430579036259701492}
+  snowManAnimator: {fileID: 1638576444448550561}
   trail: {fileID: 4030579952334626948}
   walkTrailSize: 0.8
   rollTrailSize: 1.4
@@ -413,7 +414,8 @@ MonoBehaviour:
   pivot: {fileID: 6617809486137644705}
   FOV: 75
   rotationSmoothing: 0.01
-  positionSmoothing: 0.075
+  positionSmoothing: 0.1
+  positionCorrectSpeed: 0.3
   FOVInterpolation: 0.05
   distance: 5
   yOffset: 0
@@ -694,7 +696,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3932839769509309893}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Viewmodel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -765,7 +767,7 @@ Light:
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 0.5
-  m_Range: 15
+  m_Range: 25
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -930,10 +932,60 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3932839769509309893}
     m_Modifications:
+    - target: {fileID: 1251963727372041476, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 630
+      objectReference: {fileID: 0}
     - target: {fileID: 1391622197833883145, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_Name
       value: Snowman
+      objectReference: {fileID: 0}
+    - target: {fileID: 2331597965570862659, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2364165076020956360, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3400694757300212858, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3997494044973895901, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 1081
+      objectReference: {fileID: 0}
+    - target: {fileID: 4399727029996965993, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 1081
+      objectReference: {fileID: 0}
+    - target: {fileID: 4590368413930830086, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5242082126317521138, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5296307190523344334, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5659855733032983859, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 1081
       objectReference: {fileID: 0}
     - target: {fileID: 6047366502352455182, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -985,6 +1037,31 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6047366502352455182, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7061055210735147474, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 1081
+      objectReference: {fileID: 0}
+    - target: {fileID: 7750142014312290844, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8373078760602018020, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_Layer
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8439780689196593512, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+        type: 3}
+      propertyPath: m_VersionIndex
+      value: 1345
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -993,6 +1070,12 @@ PrefabInstance:
 --- !u!1 &938944323205619726 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1391622197833883145, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+    type: 3}
+  m_PrefabInstance: {fileID: 2186433740776259079}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1638576444448550561 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 642503464077234342, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
     type: 3}
   m_PrefabInstance: {fileID: 2186433740776259079}
   m_PrefabAsset: {fileID: 0}
@@ -1048,7 +1131,7 @@ PrefabInstance:
     - target: {fileID: 7596528447725386976, guid: d908ab252b6d229468c68acfb988be8e,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1806
+      value: 1809
       objectReference: {fileID: 0}
     - target: {fileID: 7596528447725386976, guid: d908ab252b6d229468c68acfb988be8e,
         type: 3}

@@ -10843,22 +10843,12 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 257282760}
-    - target: {fileID: 1638576444448550561, guid: a93298fd51f2aa242905f72378431e35,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2080998231137126866, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: hitWallParticle
       value: 
-      objectReference: {fileID: 1050036365963399261, guid: c56743b7cfc5caf4288d4153058493b8,
+      objectReference: {fileID: 1050036365963399261, guid: 753d1972d75b3b149acf3be7293cb094,
         type: 3}
-    - target: {fileID: 2080998231137126866, guid: a93298fd51f2aa242905f72378431e35,
-        type: 3}
-      propertyPath: snowManAnimator
-      value: 
-      objectReference: {fileID: 1571332782}
     - target: {fileID: 2547134733079473774, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: m_Mesh
@@ -10959,16 +10949,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 5601152114617563145, guid: a93298fd51f2aa242905f72378431e35,
-        type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5826564085822923572, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 2038823713}
+    - target: {fileID: 5965798720975813070, guid: a93298fd51f2aa242905f72378431e35,
+        type: 3}
+      propertyPath: positionSmoothing
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 7743898005491027823, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: m_Mesh
@@ -10979,21 +10969,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 257282760}
-    - target: {fileID: 8547445007558141477, guid: a93298fd51f2aa242905f72378431e35,
-        type: 3}
-      propertyPath: m_SelectedEdges.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8547445007558141477, guid: a93298fd51f2aa242905f72378431e35,
-        type: 3}
-      propertyPath: m_SelectedFaces.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8547445007558141477, guid: a93298fd51f2aa242905f72378431e35,
-        type: 3}
-      propertyPath: m_SelectedVertices.Array.size
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 9199215400190978005, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: m_Mesh
@@ -11364,12 +11339,6 @@ Mesh:
     offset: 0
     size: 0
     path: 
---- !u!95 &1571332782 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 1638576444448550561, guid: a93298fd51f2aa242905f72378431e35,
-    type: 3}
-  m_PrefabInstance: {fileID: 1516031005}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1643587960
 PrefabInstance:
   m_ObjectHideFlags: 0

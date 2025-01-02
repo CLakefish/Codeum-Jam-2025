@@ -16,7 +16,6 @@ public class RespawnEditor : Editor
     }
 }
 
-
 #endif
 
 public class Respawn : MonoBehaviour
@@ -41,6 +40,7 @@ public class Respawn : MonoBehaviour
             case "Player":
                 LevelManager.Instance.ResetAll();
                 other.attachedRigidbody.position = spawnPosition;
+                other.attachedRigidbody.velocity = Vector3.zero;
                 break;
 
             case "Collidable":
