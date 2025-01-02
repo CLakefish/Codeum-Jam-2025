@@ -10948,11 +10948,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 2038823713}
-    - target: {fileID: 5965798720975813070, guid: a93298fd51f2aa242905f72378431e35,
-        type: 3}
-      propertyPath: positionSmoothing
-      value: 0.05
-      objectReference: {fileID: 0}
     - target: {fileID: 7743898005491027823, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: m_Mesh
