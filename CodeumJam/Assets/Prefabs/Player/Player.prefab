@@ -414,14 +414,14 @@ MonoBehaviour:
   pivot: {fileID: 6617809486137644705}
   FOV: 75
   rotationSmoothing: 0.01
-  positionSmoothing: 0.1
+  positionSmoothing: 0.05
   positionCorrectSpeed: 0.3
   FOVInterpolation: 0.05
   distance: 5
   yOffset: 0
   boxSize: {x: 0.01, y: 5, z: 0.01}
-  rollBoostFOV: 15
-  rollFOVReduction: 8
+  rollBoostFOV: 17.5
+  rollFOVReduction: 6
   canRotate: 1
 --- !u!114 &3583783913031493916
 MonoBehaviour:
@@ -456,7 +456,7 @@ MonoBehaviour:
   wallJumpForce: 10
   wallJumpHeight: 15
   wallJumpTime: 0.3
-  wallJumpAngle: 45
+  wallJumpAngle: 30
 --- !u!1 &5430579036259701492
 GameObject:
   m_ObjectHideFlags: 0
@@ -935,7 +935,7 @@ PrefabInstance:
     - target: {fileID: 1251963727372041476, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 630
+      value: 633
       objectReference: {fileID: 0}
     - target: {fileID: 1391622197833883145, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -960,12 +960,12 @@ PrefabInstance:
     - target: {fileID: 3997494044973895901, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1081
+      value: 1084
       objectReference: {fileID: 0}
     - target: {fileID: 4399727029996965993, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1081
+      value: 1084
       objectReference: {fileID: 0}
     - target: {fileID: 4590368413930830086, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -985,7 +985,7 @@ PrefabInstance:
     - target: {fileID: 5659855733032983859, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1081
+      value: 1084
       objectReference: {fileID: 0}
     - target: {fileID: 6047366502352455182, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1045,7 +1045,7 @@ PrefabInstance:
     - target: {fileID: 7061055210735147474, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1081
+      value: 1084
       objectReference: {fileID: 0}
     - target: {fileID: 7750142014312290844, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1060,7 +1060,7 @@ PrefabInstance:
     - target: {fileID: 8439780689196593512, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1345
+      value: 1348
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1131,7 +1131,7 @@ PrefabInstance:
     - target: {fileID: 7596528447725386976, guid: d908ab252b6d229468c68acfb988be8e,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1809
+      value: 1812
       objectReference: {fileID: 0}
     - target: {fileID: 7596528447725386976, guid: d908ab252b6d229468c68acfb988be8e,
         type: 3}

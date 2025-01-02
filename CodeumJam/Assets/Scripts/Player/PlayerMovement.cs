@@ -47,7 +47,7 @@ public class PlayerMovement : Player.PlayerComponent
     private readonly float FLOOR_STICK_THRESHOLD     = 0.05f;
     private readonly float FLOOR_STICK_INTERPOLATION = 0.1f;
     private readonly float JUMP_GRACE_TIME           = 0.1f;
-    private readonly float CAMERA_CORRECT_THRESHOLD  = 0.1f;
+    private readonly float CAMERA_CORRECT_THRESHOLD  = 0.25f;
 
     private Vector3 MoveDir {
         get {
@@ -158,7 +158,7 @@ public class PlayerMovement : Player.PlayerComponent
 
         // Since the fsm initial state is not assigned at addition, you have to do it manually. Might change it
         // Initialize HFSM with state
-        fsm.SetStartState(Walking);
+        fsm.SetStartState(Falling);
     }
 
     void Update()

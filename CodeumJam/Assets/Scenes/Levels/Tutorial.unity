@@ -10843,12 +10843,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 257282760}
-    - target: {fileID: 2080998231137126866, guid: a93298fd51f2aa242905f72378431e35,
-        type: 3}
-      propertyPath: hitWallParticle
-      value: 
-      objectReference: {fileID: 1050036365963399261, guid: 753d1972d75b3b149acf3be7293cb094,
-        type: 3}
     - target: {fileID: 2547134733079473774, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: m_Mesh
@@ -10957,7 +10951,7 @@ PrefabInstance:
     - target: {fileID: 5965798720975813070, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: positionSmoothing
-      value: 0.1
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 7743898005491027823, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
