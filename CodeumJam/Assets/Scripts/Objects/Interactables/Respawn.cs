@@ -31,6 +31,10 @@ public class Respawn : MonoBehaviour
         Gizmos.DrawSphere(SpawnPosition, 0.1f);
     }
 
+    private void Start() {
+        Player.Instance.SetSpawn(SpawnPosition);
+    }
+
     private void OnTriggerStay(Collider other)
     {
         if (other.attachedRigidbody == null) return;
@@ -39,8 +43,8 @@ public class Respawn : MonoBehaviour
         {
             case "Player":
                 LevelManager.Instance.ResetAll();
-                other.attachedRigidbody.position = spawnPosition;
-                other.attachedRigidbody.velocity = Vector3.zero;
+                Player.Instance.SetSpawn(SpawnPosition);
+                Player.Instance.Respawn();
                 break;
 
             case "Collidable":

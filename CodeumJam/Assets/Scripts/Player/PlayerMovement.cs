@@ -241,6 +241,12 @@ public class PlayerMovement : Player.PlayerComponent
         GroundCollision = false;
     }
 
+    public void Respawn() {
+        fsm.ChangeState(Walking);
+        rb.velocity        = Vector3.zero;
+        HorizontalVelocity = Vector2.zero;
+    }
+
     private void CheckGroundCollisions() {
         float dist = fsm.CurrentState == Walking ? groundCastDist : fallCastDist;
 
@@ -301,6 +307,7 @@ public class PlayerMovement : Player.PlayerComponent
 
         public override void Enter() {
             context.HitGround?.Invoke();
+            context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.positionSmoothing);
         }
 
         // Called when state is first created
@@ -459,7 +466,7 @@ public class PlayerMovement : Player.PlayerComponent
         public override void Update() {
             CheckTransitions();
 
-            context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.positionSmoothing);
+            context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.ballSmoothing);
             context.PlayerCamera.AddFOV(context.rb.velocity.magnitude / context.PlayerCamera.rollFOVReduction);
 
             base.Update();
@@ -532,6 +539,9 @@ public class PlayerMovement : Player.PlayerComponent
 
             if (context.rb.velocity.y <= context.rollJumpForce) {
                 context.SetY(context.rollJumpForce);
+            }
+            else {
+                context.rb.velocity += Vector3.up;
             }
         }
     }

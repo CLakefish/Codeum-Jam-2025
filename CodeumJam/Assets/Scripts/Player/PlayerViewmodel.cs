@@ -20,6 +20,7 @@ public class PlayerViewmodel : Player.PlayerComponent
     [SerializeField] private ParticleSystem landParticle;
     [SerializeField] private ParticleSystem jumpParticle;
     [SerializeField] private ParticleSystem hitWallParticle;
+    [SerializeField] private ParticleSystem explodeParticle;
 
     [Header("Smoothing")]
     [SerializeField] private float viewmodelSmoothing;
@@ -37,7 +38,7 @@ public class PlayerViewmodel : Player.PlayerComponent
 
     private const float Z_FIGHTING_PUSH = 0.015f;
 
-    private Quaternion prevRollRotation;
+    private Quaternion prevRollRotation = Quaternion.identity;
     private float viewmodelVel = 0;
     private bool isSnowman = true;
 
@@ -122,5 +123,28 @@ public class PlayerViewmodel : Player.PlayerComponent
 
         snowBall.SetActive(active);
         snowMan.SetActive(!active);
+    }
+
+    public void TurnOff()
+    {
+        snowMan.SetActive(false);
+        snowBall.SetActive(false);
+        shadow.SetActive(false);
+    }
+
+    public void Respawn()
+    {
+        snowBall.SetActive(false);
+        snowMan.SetActive(true);
+        shadow.SetActive(true);
+        snowManAnimator.SetTrigger("Spawn");
+    }
+
+    public void Explode()
+    {
+        TurnOff();
+        trail.emitting = false;
+
+        ParticleSystem explosion = Instantiate(explodeParticle, rb.transform.position, Quaternion.identity);
     }
 }

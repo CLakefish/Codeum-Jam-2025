@@ -72,6 +72,7 @@ public class LevelManager : MonoBehaviour
         }
 
         levelComplete = true;
+        Player.Instance.Explode();
         cutsceneManager.TriggerCutscene(CutsceneManager.CutsceneType.End);
     }
 }

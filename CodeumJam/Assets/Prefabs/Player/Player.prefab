@@ -198,7 +198,7 @@ Transform:
   m_GameObject: {fileID: 3818191767612706358}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -392,6 +392,8 @@ MonoBehaviour:
     type: 3}
   hitWallParticle: {fileID: 1050036365963399261, guid: 753d1972d75b3b149acf3be7293cb094,
     type: 3}
+  explodeParticle: {fileID: 1050036365963399261, guid: c56743b7cfc5caf4288d4153058493b8,
+    type: 3}
   viewmodelSmoothing: 0.1
   snowManShadowSize: 1
   snowBallShadowSize: 1.75
@@ -414,8 +416,9 @@ MonoBehaviour:
   pivot: {fileID: 6617809486137644705}
   FOV: 75
   rotationSmoothing: 0.01
-  positionSmoothing: 0.05
+  positionSmoothing: 0.1
   positionCorrectSpeed: 0.3
+  ballSmoothing: 0.025
   FOVInterpolation: 0.05
   distance: 5
   yOffset: 0
@@ -452,7 +455,7 @@ MonoBehaviour:
   rollJumpForce: 15
   rollBoostForce: 12
   rollIdleSpeed: 5
-  rollMinBounceAngle: 45
+  rollMinBounceAngle: 70
   wallJumpForce: 10
   wallJumpHeight: 15
   wallJumpTime: 0.3
@@ -483,7 +486,7 @@ Transform:
   m_GameObject: {fileID: 5430579036259701492}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.05, z: 0}
+  m_LocalPosition: {x: 0, y: -1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -712,7 +715,7 @@ Transform:
   m_GameObject: {fileID: 7185026763776867553}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1040,7 +1043,7 @@ PrefabInstance:
     - target: {fileID: 6047366502352455182, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_ConstrainProportionsScale
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7061055210735147474, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1115,6 +1118,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3022653027642206659, guid: d908ab252b6d229468c68acfb988be8e,
         type: 3}
+      propertyPath: cam
+      value: 
+      objectReference: {fileID: 7118694352382091937}
+    - target: {fileID: 3022653027642206659, guid: d908ab252b6d229468c68acfb988be8e,
+        type: 3}
       propertyPath: player
       value: 
       objectReference: {fileID: 3682014680447002597}
@@ -1122,11 +1130,21 @@ PrefabInstance:
         type: 3}
       propertyPath: playerCamera
       value: 
-      objectReference: {fileID: 7118694352382091937}
+      objectReference: {fileID: 5965798720975813070}
+    - target: {fileID: 3022653027642206659, guid: d908ab252b6d229468c68acfb988be8e,
+        type: 3}
+      propertyPath: playerMovement
+      value: 
+      objectReference: {fileID: 3583783913031493916}
+    - target: {fileID: 3022653027642206659, guid: d908ab252b6d229468c68acfb988be8e,
+        type: 3}
+      propertyPath: playerViewmodel
+      value: 
+      objectReference: {fileID: 2080998231137126866}
     - target: {fileID: 6953291218322635044, guid: d908ab252b6d229468c68acfb988be8e,
         type: 3}
       propertyPath: spawnPosition.y
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7596528447725386976, guid: d908ab252b6d229468c68acfb988be8e,
         type: 3}

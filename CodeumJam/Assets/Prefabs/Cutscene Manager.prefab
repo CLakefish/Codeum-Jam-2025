@@ -83,12 +83,18 @@ MonoBehaviour:
   - {fileID: 4166170452632154771}
   - {fileID: 221977481782002841}
   endPosition: {fileID: 4431773718427710307}
+  cam: {fileID: 0}
+  playerCamera: {fileID: 0}
+  playerMovement: {fileID: 0}
+  playerViewmodel: {fileID: 0}
   player: {fileID: 0}
   levelName: Test
   levelDescription: Hello! This is a test!
-  endPause: 0.5
+  endPause: 0.65
+  spawnTime: 0.6
   interpolationSpeed: 0.8
   positionThreshold: 0.5
+  CutscenePlaying: 0
 --- !u!1 &4796934911145630371
 GameObject:
   m_ObjectHideFlags: 0

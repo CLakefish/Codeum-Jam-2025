@@ -7,6 +7,7 @@ public class CutsceneManager : MonoBehaviour
     public enum CutsceneType { 
         Intro,
         End,
+        Respawn,
     }
 
     public static CutsceneManager Instance { get; private set; }
@@ -14,7 +15,12 @@ public class CutsceneManager : MonoBehaviour
     [Header("Camera")]
     [SerializeField] private List<Transform> introPositions;
     [SerializeField] private Transform endPosition;
-    [SerializeField] private Camera playerCamera;
+    [SerializeField] private Camera cam;
+
+    [Header("Player References")]
+    [SerializeField] private PlayerCamera playerCamera;
+    [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private PlayerViewmodel playerViewmodel;
     [SerializeField] private Player player;
 
     [Header("Intro")]
@@ -23,6 +29,9 @@ public class CutsceneManager : MonoBehaviour
 
     [Header("End")]
     [SerializeField] private float endPause;
+
+    [Header("Respawn")]
+    [SerializeField] private float spawnTime;
 
     [Header("Interpolation")]
     [SerializeField] private float interpolationSpeed;
@@ -42,13 +51,15 @@ public class CutsceneManager : MonoBehaviour
     }
 
     private void Awake() {
-        playerCamera.transform.position = introPositions[0].position;
-        playerCamera.transform.forward  = introPositions[0].forward;
+        cam.transform.position = introPositions[0].position;
+        cam.transform.forward  = introPositions[0].forward;
     }
 
     private void Update() {
         if (Input.GetKeyDown(KeyCode.Space) && cutscene != null) {
             CutscenePlaying = false;
+
+            Transform viewCamera = Camera.main.transform;
 
             switch (cutsceneType) { 
                 case CutsceneType.Intro:
@@ -56,14 +67,22 @@ public class CutsceneManager : MonoBehaviour
                     StopCoroutine(cutscene);
                     EnablePlayer(true);
 
-                    Transform viewCamera = Camera.main.transform;
                     viewCamera.transform.localPosition = Vector3.zero;
                     viewCamera.transform.localRotation = Quaternion.identity;
+
+                    player.Respawn();
                     break;
 
                 case CutsceneType.End:
                     EndCutsceneTrigger?.Invoke();
                     ChangeScene?.Invoke();
+                    break;
+
+                case CutsceneType.Respawn:
+                    viewCamera.transform.localPosition = Vector3.zero;
+                    viewCamera.transform.localRotation = Quaternion.identity;
+
+                    player.AllowMovement(true);
                     break;
             }
 
@@ -104,23 +123,28 @@ public class CutsceneManager : MonoBehaviour
     public void TriggerCutscene(CutsceneType cutsceneType) {
         if (cutscene != null) StopCoroutine(cutscene);
         this.cutsceneType = cutsceneType;
-        EnablePlayer(false);
         CutscenePlaying = true;
 
         switch (cutsceneType) {
             case CutsceneType.Intro:
+                EnablePlayer(false);
                 cutscene = StartCoroutine(IntroCutscene());
                 break;
 
             case CutsceneType.End:
+                EnablePlayer(false);
                 cutscene = StartCoroutine(EndCutscene());
+                break;
+
+            case CutsceneType.Respawn:
+                cutscene = StartCoroutine(RespawnCutscene());
                 break;
         }
     }
 
     private IEnumerator IntroCutscene() {
-        playerCamera.transform.position = introPositions[0].position;
-        playerCamera.transform.forward  = introPositions[0].forward;
+        cam.transform.position = introPositions[0].position;
+        cam.transform.forward  = introPositions[0].forward;
 
         Vector3 positionVelocity = Vector3.zero;
         Vector3 rotationVelocity = Vector3.zero;
@@ -128,41 +152,54 @@ public class CutsceneManager : MonoBehaviour
         IntroCutsceneTrigger?.Invoke();
 
         for (int i = 0; i < introPositions.Count; ++i) {
-            while (Vector3.Distance(playerCamera.transform.position, introPositions[i].position) > positionThreshold) {
-                playerCamera.transform.position = Vector3.SmoothDamp(playerCamera.transform.position, introPositions[i].position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
-                playerCamera.transform.forward  = Vector3.SmoothDamp(playerCamera.transform.forward,  introPositions[i].forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+            while (Vector3.Distance(cam.transform.position, introPositions[i].position) > positionThreshold) {
+                cam.transform.position = Vector3.SmoothDamp(cam.transform.position, introPositions[i].position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+                cam.transform.forward  = Vector3.SmoothDamp(cam.transform.forward,  introPositions[i].forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
                 yield return null;
             }
 
-            playerCamera.transform.position = introPositions[i].position;
-            playerCamera.transform.forward  = introPositions[i].forward;
+            cam.transform.position = introPositions[i].position;
+            cam.transform.forward  = introPositions[i].forward;
         }
 
         Transform camParent = player.GetCamera().Pivot;
 
-        while (Vector3.Distance(playerCamera.transform.position, camParent.position) > 0.01f) {
-            playerCamera.transform.position = Vector3.SmoothDamp(playerCamera.transform.position, camParent.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
-            playerCamera.transform.forward  = Vector3.SmoothDamp(playerCamera.transform.forward,  camParent.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+        while (Vector3.Distance(cam.transform.position, camParent.position) > 0.01f) {
+            cam.transform.position = Vector3.SmoothDamp(cam.transform.position, camParent.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+            cam.transform.forward  = Vector3.SmoothDamp(cam.transform.forward,  camParent.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
             yield return null;
         }
 
         CutscenePlaying = false;
+        player.Respawn();
         EnablePlayer(true);
     }
-
     private IEnumerator EndCutscene() {
         Vector3 positionVelocity = Vector3.zero;
         Vector3 rotationVelocity = Vector3.zero;
 
         yield return new WaitForSeconds(endPause);
 
-        while (Vector3.Distance(playerCamera.transform.position, endPosition.position) > positionThreshold) {
-            playerCamera.transform.position = Vector3.SmoothDamp(playerCamera.transform.position, endPosition.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
-            playerCamera.transform.forward  = Vector3.SmoothDamp(playerCamera.transform.forward,  endPosition.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+        while (Vector3.Distance(cam.transform.position, endPosition.position) > positionThreshold) {
+            cam.transform.position = Vector3.SmoothDamp(cam.transform.position, endPosition.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
+            cam.transform.forward  = Vector3.SmoothDamp(cam.transform.forward,  endPosition.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
             yield return null;
         }
 
         EndCutsceneTrigger?.Invoke();
         CutscenePlaying = false;
+    }
+    private IEnumerator RespawnCutscene()
+    {
+        playerMovement.Respawn();
+        playerViewmodel.TurnOff();
+        playerViewmodel.Respawn();
+        playerCamera.SetBoxBoundBottom(0);
+
+        player.AllowMovement(false);
+
+        yield return new WaitForSeconds(spawnTime);
+
+        player.AllowMovement(true);
     }
 }

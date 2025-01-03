@@ -57,7 +57,7 @@ public class Menu : MonoBehaviour
 
         menuPanel[menuID].SetActive(true);
         player.GetComponent<PlayerInput>().MouseLock = false;
-        player.GetComponent<Player>().AllowMovement(false);
+        //player.GetComponent<Player>().AllowMovement(false);
         //player.
         //player.playerComponent.PlayerInput.MouseLock = true;
 
@@ -72,7 +72,7 @@ public class Menu : MonoBehaviour
             //Debug.Log(panel.name);
         }
         player.GetComponent<PlayerInput>().MouseLock = true;
-        player.GetComponent<Player>().AllowMovement(true);
+        //player.GetComponent<Player>().AllowMovement(true);
         Time.timeScale = 1.0f;
     }
     public void ReturntoMenu()

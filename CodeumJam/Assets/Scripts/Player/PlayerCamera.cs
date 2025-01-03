@@ -19,6 +19,7 @@ public class PlayerCamera : Player.PlayerComponent
     [SerializeField] private float rotationSmoothing;
     [SerializeField] public float  positionSmoothing;
     [SerializeField] public float  positionCorrectSpeed;
+    [SerializeField] public float  ballSmoothing;
     [SerializeField] private float FOVInterpolation;
 
     [Header("Offsets and Bounds")]
