@@ -461,6 +461,8 @@ public class PlayerMovement : Player.PlayerComponent
 
                 context.PlayerCamera.AddFOV(context.PlayerCamera.rollBoostFOV);
             }
+
+            base.Enter();
         }
 
         public override void Update() {
@@ -473,6 +475,8 @@ public class PlayerMovement : Player.PlayerComponent
         }
 
         public override void FixedUpdate() {
+            context.rb.angularVelocity = Quaternion.Euler(0, 90, 0) * context.rb.velocity;
+
             Collider[] colliders = Physics.OverlapSphere(context.rb.position, context.SphereCollider.radius + 0.01f, context.PlayerLayer);
 
             foreach (var collider in colliders) {

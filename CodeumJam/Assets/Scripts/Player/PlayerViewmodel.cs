@@ -93,11 +93,7 @@ public class PlayerViewmodel : Player.PlayerComponent
             trail.transform.forward  = -PlayerMovement.GroundNormal;
         }
 
-        if (!IsSnowman) {
-            rb.angularVelocity = Quaternion.Euler(0, 90, 0) * rb.velocity;
-            snowBall.transform.rotation = rb.rotation;
-        }
-        else {
+        if (IsSnowman) {
             snowManAnimator.SetBool("Jump", PlayerMovement.IsJumping);
             snowManAnimator.SetBool("Grounded", PlayerMovement.GroundCollision);
             snowManAnimator.SetBool("Falling", !PlayerMovement.GroundCollision);

@@ -13,6 +13,15 @@ public class LevelManager : MonoBehaviour
     private readonly HashSet<PointOfInterest> pointsOfInterest = new();
     private bool levelComplete = false;
 
+    public int TotalPointsOfInterest {
+        get {
+            return pointsOfInterest.Count;
+        }
+    }
+
+    private int totalActive;
+    public int TotalActive => totalActive;
+
     private void OnEnable() {
         if (Instance == null) Instance = this;
         GetReferences();
@@ -21,6 +30,8 @@ public class LevelManager : MonoBehaviour
     private void Start() {
         cutsceneManager.TriggerCutscene(CutsceneManager.CutsceneType.Intro);
         cutsceneManager.ChangeScene += () => levelScriptableObject.ChangeScene();
+
+        totalActive = TotalPointsOfInterest;
     }
 
     private void OnDrawGizmos()
@@ -59,7 +70,6 @@ public class LevelManager : MonoBehaviour
 
     public void ResetAll() {
         if (levelComplete) return;
-
         foreach (var r in resettables) {
             r.gameObject.SetActive(true);
             r.OnReset();
@@ -67,9 +77,17 @@ public class LevelManager : MonoBehaviour
     }
 
     private void CheckComplete() {
+        int total = 0;
+
         foreach (var p in pointsOfInterest) {
-            if (!p.HasTriggered) return;
+            if (!p.HasTriggered) continue;
+
+            total++;
         }
+
+        totalActive = TotalPointsOfInterest - total;
+
+        if (totalActive > 0) return;
 
         levelComplete = true;
         Player.Instance.Explode();
