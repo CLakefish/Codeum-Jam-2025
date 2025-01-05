@@ -70,6 +70,9 @@ public class LevelManager : MonoBehaviour
 
     public void ResetAll() {
         if (levelComplete) return;
+
+        totalActive = TotalPointsOfInterest;
+
         foreach (var r in resettables) {
             r.gameObject.SetActive(true);
             r.OnReset();
