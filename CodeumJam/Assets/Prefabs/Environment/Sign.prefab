@@ -1201,8 +1201,9 @@ MonoBehaviour:
       m_Calls: []
   m_text: WASD TO MOVE
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c4b2c2ac34526924f9748b99de5d7856, type: 2}
+  m_sharedMaterial: {fileID: 6987215261400097651, guid: c4b2c2ac34526924f9748b99de5d7856,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
