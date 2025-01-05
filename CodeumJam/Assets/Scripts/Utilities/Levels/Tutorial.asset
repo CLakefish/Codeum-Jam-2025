@@ -16,3 +16,6 @@ MonoBehaviour:
   displaySprite: {fileID: 21300000, guid: 92c50cd3d54e91b4997756d6fd328134, type: 3}
   displayName: Tutorial
   description: Learn how to explode
+  completedMessages:
+  - Kaboom
+  - Kablooey

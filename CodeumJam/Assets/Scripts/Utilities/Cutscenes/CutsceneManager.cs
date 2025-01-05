@@ -23,9 +23,8 @@ public class CutsceneManager : MonoBehaviour
     [SerializeField] private PlayerViewmodel playerViewmodel;
     [SerializeField] private Player player;
 
-    [Header("Intro")]
-    [SerializeField] private string levelName;
-    [SerializeField] private string levelDescription;
+    [Header("Cutscene References")]
+    [SerializeField] private CutsceneCanvas cutsceneCanvas;
 
     [Header("End")]
     [SerializeField] private float endPause;
@@ -58,7 +57,6 @@ public class CutsceneManager : MonoBehaviour
     private void Update() {
         if (Input.GetKeyDown(KeyCode.Space) && cutscene != null) {
             CutscenePlaying = false;
-
             Transform viewCamera = Camera.main.transform;
 
             switch (cutsceneType) { 
@@ -72,6 +70,7 @@ public class CutsceneManager : MonoBehaviour
 
                     player.RespawnPlayer();
                     player.playerThermometer.OpenThermometer(true);
+                    cutsceneCanvas.CutsceneText(CutsceneCanvas.CutsceneTextEvent.TurnOff);
                     break;
 
                 case CutsceneType.End:
@@ -127,6 +126,8 @@ public class CutsceneManager : MonoBehaviour
         this.cutsceneType = cutsceneType;
         CutscenePlaying = true;
 
+        cutsceneCanvas.SetText(LevelManager.Instance.currentLevel);
+
         switch (cutsceneType) {
             case CutsceneType.Intro:
                 EnablePlayer(false);
@@ -152,6 +153,7 @@ public class CutsceneManager : MonoBehaviour
         Vector3 rotationVelocity = Vector3.zero;
 
         IntroCutsceneTrigger?.Invoke();
+        cutsceneCanvas.CutsceneText(CutsceneCanvas.CutsceneTextEvent.Start);
 
         for (int i = 0; i < introPositions.Count; ++i) {
             while (Vector3.Distance(cam.transform.position, introPositions[i].position) > positionThreshold) {
@@ -165,6 +167,7 @@ public class CutsceneManager : MonoBehaviour
         }
 
         player.playerThermometer.OpenThermometer(true);
+        cutsceneCanvas.CutsceneText(CutsceneCanvas.CutsceneTextEvent.TurnOff);
 
         Transform camParent = player.GetCamera().Pivot;
 
@@ -185,13 +188,14 @@ public class CutsceneManager : MonoBehaviour
 
         yield return new WaitForSeconds(endPause);
 
+        player.playerThermometer.OpenThermometer(false);
+        cutsceneCanvas.CutsceneText(CutsceneCanvas.CutsceneTextEvent.End);
+
         while (Vector3.Distance(cam.transform.position, endPosition.position) > positionThreshold) {
             cam.transform.position = Vector3.SmoothDamp(cam.transform.position, endPosition.position, ref positionVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
             cam.transform.forward  = Vector3.SmoothDamp(cam.transform.forward,  endPosition.forward,  ref rotationVelocity, interpolationSpeed, Mathf.Infinity, Time.unscaledDeltaTime);
             yield return null;
         }
-
-        player.playerThermometer.OpenThermometer(false);
 
         EndCutsceneTrigger?.Invoke();
         CutscenePlaying = false;

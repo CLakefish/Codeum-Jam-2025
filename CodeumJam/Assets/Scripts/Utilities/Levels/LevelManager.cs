@@ -7,7 +7,8 @@ public class LevelManager : MonoBehaviour
     public static LevelManager Instance;
 
     [SerializeField] public CutsceneManager       cutsceneManager;
-    [SerializeField] public LevelScriptableObject levelScriptableObject;
+    [SerializeField] public LevelScriptableObject levelToGoTo;
+    [SerializeField] public LevelScriptableObject currentLevel;
 
     private readonly HashSet<Resettable> resettables           = new();
     private readonly HashSet<PointOfInterest> pointsOfInterest = new();
@@ -29,7 +30,7 @@ public class LevelManager : MonoBehaviour
 
     private void Start() {
         cutsceneManager.TriggerCutscene(CutsceneManager.CutsceneType.Intro);
-        cutsceneManager.ChangeScene += () => levelScriptableObject.ChangeScene();
+        cutsceneManager.ChangeScene += () => levelToGoTo.ChangeScene();
 
         totalActive = TotalPointsOfInterest;
     }
