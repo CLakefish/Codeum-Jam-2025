@@ -70,12 +70,14 @@ public class CutsceneManager : MonoBehaviour
                     viewCamera.transform.localPosition = Vector3.zero;
                     viewCamera.transform.localRotation = Quaternion.identity;
 
-                    player.Respawn();
+                    player.RespawnPlayer();
+                    player.playerThermometer.OpenThermometer(true);
                     break;
 
                 case CutsceneType.End:
                     EndCutsceneTrigger?.Invoke();
                     ChangeScene?.Invoke();
+                    player.playerThermometer.OpenThermometer(false);
                     break;
 
                 case CutsceneType.Respawn:
@@ -162,6 +164,8 @@ public class CutsceneManager : MonoBehaviour
             cam.transform.forward  = introPositions[i].forward;
         }
 
+        player.playerThermometer.OpenThermometer(true);
+
         Transform camParent = player.GetCamera().Pivot;
 
         while (Vector3.Distance(cam.transform.position, camParent.position) > 0.01f) {
@@ -171,9 +175,10 @@ public class CutsceneManager : MonoBehaviour
         }
 
         CutscenePlaying = false;
-        player.Respawn();
+        player.RespawnPlayer();
         EnablePlayer(true);
     }
+
     private IEnumerator EndCutscene() {
         Vector3 positionVelocity = Vector3.zero;
         Vector3 rotationVelocity = Vector3.zero;
@@ -186,9 +191,12 @@ public class CutsceneManager : MonoBehaviour
             yield return null;
         }
 
+        player.playerThermometer.OpenThermometer(false);
+
         EndCutsceneTrigger?.Invoke();
         CutscenePlaying = false;
     }
+
     private IEnumerator RespawnCutscene()
     {
         playerMovement.Respawn();

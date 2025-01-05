@@ -20,6 +20,9 @@ public class RespawnEditor : Editor
 
 public class Respawn : MonoBehaviour
 {
+    public static Respawn Instance { get; private set; }
+
+
     [SerializeField] private Vector3 spawnPosition;
 
     public Vector3 SpawnPosition => spawnPosition;
@@ -29,6 +32,12 @@ public class Respawn : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawSphere(SpawnPosition, 0.1f);
+    }
+
+    private void Awake()
+    {
+        if (Instance != null) return;
+        Instance = this;
     }
 
     private void Start() {
@@ -42,9 +51,7 @@ public class Respawn : MonoBehaviour
         switch (other.gameObject.tag)
         {
             case "Player":
-                LevelManager.Instance.ResetAll();
-                Player.Instance.SetSpawn(SpawnPosition);
-                Player.Instance.Respawn();
+                RespawnPlayer();
                 break;
 
             case "Collidable":
@@ -55,5 +62,12 @@ public class Respawn : MonoBehaviour
                 other.transform.position = spawnPosition;
                 break;
         }
+    }
+
+    public void RespawnPlayer()
+    {
+        LevelManager.Instance.ResetAll();
+        Player.Instance.SetSpawn(SpawnPosition);
+        Player.Instance.RespawnPlayer();
     }
 }

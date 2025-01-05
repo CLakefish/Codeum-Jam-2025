@@ -485,16 +485,25 @@ public class PlayerMovement : Player.PlayerComponent
                 }
             }
 
-            if (Physics.SphereCast(context.rb.position, context.SphereCollider.radius - 0.01f, context.MomentumNoY.normalized, out RaycastHit hit, context.rollBounceCastDistance, context.GroundLayer)) {
-                float angle = Vector3.Angle(Vector3.up, hit.normal);
+            foreach (Vector3 dir in new Vector3[2] {
+                context.MomentumNoY.normalized,
+                context.MoveDir,
+            })
+            {
+                if (Physics.SphereCast(context.rb.position, context.SphereCollider.radius - 0.1f, dir, out RaycastHit hit, context.rollBounceCastDistance, context.GroundLayer))
+                {
+                    float angle = Vector3.Angle(Vector3.up, hit.normal);
 
-                if (angle >= context.rollMinBounceAngle && !hit.collider.CompareTag("NoBounce")) {
-                    Vector3 rotatedVel  = Vector3.Reflect(context.rb.velocity, hit.normal);
-                    rotatedVel.y        = 0;
-                    rotatedVel          = rotatedVel.normalized * Mathf.Max(context.rb.velocity.magnitude, context.rollIdleSpeed);
-                    context.rb.velocity = rotatedVel;
+                    if (angle >= context.rollMinBounceAngle && !hit.collider.CompareTag("NoBounce"))
+                    {
+                        Vector3 rotatedVel = Vector3.Reflect(context.rb.velocity, hit.normal);
+                        rotatedVel.y = 0;
+                        rotatedVel = rotatedVel.normalized * Mathf.Max(context.rb.velocity.magnitude, context.rollIdleSpeed);
+                        context.rb.velocity = rotatedVel;
 
-                    context.HitWall?.Invoke();
+                        context.HitWall?.Invoke();
+                        break;
+                    }
                 }
             }
 

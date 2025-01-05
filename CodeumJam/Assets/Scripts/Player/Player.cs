@@ -12,6 +12,9 @@ public class Player : MonoBehaviour
     [SerializeField] protected PlayerInput     playerInput;
     [SerializeField] private   PlayerViewmodel playerViewmodel;
 
+    [Header("Player UI")]
+    [SerializeField] public PlayerThermometer playerThermometer;
+
     [Header("Player Physics")]
     [SerializeField] private Rigidbody       rb;
     [SerializeField] private CapsuleCollider capsuleCollider;
@@ -21,6 +24,8 @@ public class Player : MonoBehaviour
 
     [Header("Player Camera")]
     [SerializeField] private Camera cam;
+
+    public bool IsSnowman => playerViewmodel.IsSnowman;
 
     private void Awake()
     {
@@ -47,8 +52,7 @@ public class Player : MonoBehaviour
     }
 
     public void SetSpawn(Vector3 pos) => rb.transform.position = pos;
-
-    public void Respawn() => CutsceneManager.Instance.TriggerCutscene(CutsceneManager.CutsceneType.Respawn);
+    public void RespawnPlayer()       => CutsceneManager.Instance.TriggerCutscene(CutsceneManager.CutsceneType.Respawn);
 
     public void Explode() {
         playerViewmodel.Explode();
