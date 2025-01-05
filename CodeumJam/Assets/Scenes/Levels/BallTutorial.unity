@@ -29542,6 +29542,26 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1969266995322174025, guid: a93298fd51f2aa242905f72378431e35,
+        type: 3}
+      propertyPath: activeColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1969266995322174025, guid: a93298fd51f2aa242905f72378431e35,
+        type: 3}
+      propertyPath: activeColor.b
+      value: 0.3019608
+      objectReference: {fileID: 0}
+    - target: {fileID: 1969266995322174025, guid: a93298fd51f2aa242905f72378431e35,
+        type: 3}
+      propertyPath: activeColor.g
+      value: 0.10980393
+      objectReference: {fileID: 0}
+    - target: {fileID: 1969266995322174025, guid: a93298fd51f2aa242905f72378431e35,
+        type: 3}
+      propertyPath: activeColor.r
+      value: 0.46274513
+      objectReference: {fileID: 0}
     - target: {fileID: 2547134733079473774, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: m_Mesh
@@ -29662,11 +29682,6 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 851697955}
-    - target: {fileID: 8945992848812828321, guid: a93298fd51f2aa242905f72378431e35,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: -117.2
-      objectReference: {fileID: 0}
     - target: {fileID: 9191240009700926433, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: spawnPosition.x

@@ -9,6 +9,7 @@ public class PlayerThermometer : MonoBehaviour
     [SerializeField] private Slider thermometer;
     [SerializeField] private RectTransform tickHolder;
     [SerializeField] private GameObject tickPrefab;
+    [SerializeField] private Color activeColor;
     [SerializeField] private TMPro.TMP_Text collectTotal;
     [SerializeField] private float smoothTime;
 
@@ -46,6 +47,9 @@ public class PlayerThermometer : MonoBehaviour
             var tick = ticks[i];
             if (i >= levelManager.TotalActive) {
                 tick.color = Color.black;
+            }
+            else {
+                tick.color = activeColor;
             }
         }
     }
