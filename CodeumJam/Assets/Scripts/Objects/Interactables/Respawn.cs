@@ -57,10 +57,6 @@ public class Respawn : MonoBehaviour
             case "Collidable":
                 other.gameObject.SetActive(false);
                 break;
-
-            default:
-                other.transform.position = spawnPosition;
-                break;
         }
     }
 

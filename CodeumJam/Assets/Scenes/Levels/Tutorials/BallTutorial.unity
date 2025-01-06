@@ -1393,6 +1393,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 80375698}
     m_Modifications:
+    - target: {fileID: 1630284249450522123, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1856072390346884152, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
       propertyPath: m_Mesh
@@ -1410,18 +1415,33 @@ PrefabInstance:
       objectReference: {fileID: 540050258}
     - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.33
+      value: -1.53
       objectReference: {fileID: 0}
     - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.9931259
+      value: -0.96
       objectReference: {fileID: 0}
     - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6.289817
+      value: -21.18
       objectReference: {fileID: 0}
     - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
@@ -1458,6 +1478,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5140063829933161721, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
       propertyPath: m_Mesh
@@ -1473,16 +1498,67 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1357177899}
+    - target: {fileID: 6952615348513809251, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: InitialModule.startSize.scalar
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6952615348513809251, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: InitialModule.startSize.minScalar
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7854249490815095844, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 540050258}
+    - target: {fileID: 8171058515690186432, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: onLaunch.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171058515690186432, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: onLaunch.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171058515690186432, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: onLaunch.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 98923934}
+    - target: {fileID: 8171058515690186432, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: onLaunch.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171058515690186432, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: onLaunch.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: set_isStatic
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171058515690186432, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: onLaunch.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 8171058515690186432, guid: 3be585871f8f94a41ae051398e5d4d96,
+        type: 3}
+      propertyPath: onLaunch.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3be585871f8f94a41ae051398e5d4d96, type: 3}
+--- !u!1 &98923934 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6571940450985884233, guid: 3be585871f8f94a41ae051398e5d4d96,
+    type: 3}
+  m_PrefabInstance: {fileID: 98923933}
+  m_PrefabAsset: {fileID: 0}
 --- !u!43 &99658929
 Mesh:
   m_ObjectHideFlags: 0
@@ -5324,7 +5400,7 @@ PrefabInstance:
     - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -86.55
+      value: -95.79
       objectReference: {fileID: 0}
     - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
@@ -5334,7 +5410,7 @@ PrefabInstance:
     - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -174.07
+      value: -168.43
       objectReference: {fileID: 0}
     - target: {fileID: 4115698405364215886, guid: 3be585871f8f94a41ae051398e5d4d96,
         type: 3}
@@ -29740,7 +29816,7 @@ PrefabInstance:
         type: 3}
       propertyPath: levelToGoTo
       value: 
-      objectReference: {fileID: 11400000, guid: fe089c3f64c849c4998ef23b73a87f9d,
+      objectReference: {fileID: 11400000, guid: cfc97a8caeb501b4d9a47816b4bb4c53,
         type: 2}
     - target: {fileID: 2368379461109106990, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}

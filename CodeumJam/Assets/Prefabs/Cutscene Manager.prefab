@@ -455,8 +455,6 @@ MonoBehaviour:
   playerViewmodel: {fileID: 0}
   player: {fileID: 0}
   cutsceneCanvas: {fileID: 1953738621242483172}
-  levelName: Test
-  levelDescription: Hello! This is a test!
   endPause: 0.65
   spawnTime: 0.6
   interpolationSpeed: 0.8
@@ -755,9 +753,9 @@ MonoBehaviour:
   m_fontSize: 160
   m_fontSizeBase: 160
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 80
+  m_fontSizeMax: 160
   m_fontStyle: 17
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
