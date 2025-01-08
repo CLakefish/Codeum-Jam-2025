@@ -16,6 +16,7 @@ public class Menu : MonoBehaviour
     [Header("Menu Objects")]
     [SerializeField] private TextMeshProUGUI nameText;
     [SerializeField] private TextMeshProUGUI descriptionText;
+    private bool MenuBool = false;
 
     [Header("Level References")]
     private string description;
@@ -35,9 +36,15 @@ public class Menu : MonoBehaviour
     }
     void Update()
     {
-        if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.E)))
+        if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.E)) && MenuBool == false)
         {
             SwitchtoMenu(0);
+            MenuBool = true;
+        }
+        else if ((Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.E)) && MenuBool == true)
+        {
+            CloseMenu();
+            MenuBool = false;
         }
         
     }
@@ -60,6 +67,11 @@ public class Menu : MonoBehaviour
         }
         player.GetComponent<PlayerInput>().MouseLock = true;
         Time.timeScale = 1.0f;
+    }
+    public void SwitchtoScene(int sceneId)
+    {
+        CloseMenu();
+        SceneManager.LoadScene(sceneId);
     }
     private void Setup()
     {
