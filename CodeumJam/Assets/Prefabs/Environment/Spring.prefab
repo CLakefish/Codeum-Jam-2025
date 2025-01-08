@@ -345,7 +345,7 @@ GameObject:
   - component: {fileID: 760321306796434539}
   - component: {fileID: 7350470343189966461}
   - component: {fileID: 6591973115742188519}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Spring
   m_TagString: NoBounce
   m_Icon: {fileID: 0}

@@ -426,8 +426,8 @@ MonoBehaviour:
   distance: 5
   yOffset: 0
   boxSize: {x: 0.01, y: 5, z: 0.01}
-  rollBoostFOV: 17.5
-  rollFOVReduction: 6
+  rollBoostFOV: 19
+  rollFOVReduction: 4
   canRotate: 1
 --- !u!114 &3583783913031493916
 MonoBehaviour:
@@ -447,7 +447,7 @@ MonoBehaviour:
   wallCastIncrement: 8
   wallCastDistance: 0.8
   rollBounceCastDistance: 1.2
-  rollCastInterpolateSpeed: 0
+  rollCastInterpolateSpeed: 0.05
   gravityForce: 48
   moveSpeed: 16
   acceleration: 100
@@ -457,7 +457,7 @@ MonoBehaviour:
   jumpBufferTime: 0.1
   rollRotationSpeed: 1
   rollJumpForce: 15
-  rollBoostForce: 12
+  rollBoostForce: 14
   rollIdleSpeed: 5
   rollMinBounceAngle: 70
   wallJumpForce: 10
