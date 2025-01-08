@@ -7097,14 +7097,14 @@ PrefabInstance:
     - target: {fileID: 383316897170015293, guid: 7825b8d01b0e2854d91edcb342c173e2,
         type: 3}
       propertyPath: m_text
-      value: 'HIT ME!
+      value: 'ROLL AT ME!
 
         :)'
       objectReference: {fileID: 0}
     - target: {fileID: 383316897170015293, guid: 7825b8d01b0e2854d91edcb342c173e2,
         type: 3}
       propertyPath: m_fontSize
-      value: 0.65
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 383316897170015293, guid: 7825b8d01b0e2854d91edcb342c173e2,
         type: 3}
@@ -7114,7 +7114,7 @@ PrefabInstance:
     - target: {fileID: 383316897170015293, guid: 7825b8d01b0e2854d91edcb342c173e2,
         type: 3}
       propertyPath: m_fontSizeBase
-      value: 0.65
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 383316897170015293, guid: 7825b8d01b0e2854d91edcb342c173e2,
         type: 3}

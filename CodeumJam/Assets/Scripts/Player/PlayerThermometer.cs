@@ -37,7 +37,7 @@ public class PlayerThermometer : MonoBehaviour
     }
 
     private void FixedUpdate() {
-        thermometer.transform.eulerAngles = new Vector3(0, 0, 90 + (Mathf.Sin(Time.time * rotationTime) * rotationIntensity));
+        thermometer.transform.localEulerAngles = new Vector3(0, 0, 90 + (Mathf.Sin(Time.time * rotationTime) * rotationIntensity));
 
         thermometer.value = Mathf.SmoothDamp(thermometer.value, levelManager.TotalActive, ref displayVel, smoothTime);
         collectTotal.text = (levelManager.TotalPointsOfInterest - levelManager.TotalActive).ToString() + "-" + levelManager.TotalPointsOfInterest.ToString();
@@ -56,7 +56,7 @@ public class PlayerThermometer : MonoBehaviour
 
     public void OpenThermometer(bool open)
     {
-        Vector3 desiredPos = open ? end.position : start.position;
+        Vector3 desiredPos = open ? end.transform.localPosition : start.transform.localPosition;
 
         if (transitionCoroutine != null) StopCoroutine(transitionCoroutine);
         transitionCoroutine = StartCoroutine(OpenThermometerCoroutine(desiredPos));
@@ -66,12 +66,12 @@ public class PlayerThermometer : MonoBehaviour
     {
         Vector3 posVel = Vector3.zero;
 
-        while (Vector3.Distance(thermometer.transform.position, position) >= 0.01f)
+        while (Vector3.Distance(thermometer.transform.localPosition, position) >= 0.01f)
         {
-            thermometer.transform.position = Vector3.SmoothDamp(thermometer.transform.position, position, ref posVel, smoothTime);
+            thermometer.transform.localPosition = Vector3.SmoothDamp(thermometer.transform.localPosition, position, ref posVel, smoothTime);
             yield return null;
         }
 
-        thermometer.transform.position = position;
+        thermometer.transform.localPosition = position;
     }
 }

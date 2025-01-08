@@ -405,6 +405,6 @@ MonoBehaviour:
       m_Calls: []
   rb: {fileID: 1129231043911639029}
   isKinematic: 0
-  launchForce: 30
+  launchForce: 35
   heightForce: 20
   gravityForce: 48

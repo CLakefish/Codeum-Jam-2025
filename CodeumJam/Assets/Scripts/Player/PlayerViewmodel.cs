@@ -87,8 +87,7 @@ public class PlayerViewmodel : Player.PlayerComponent
 
     private void FixedUpdate()
     {
-        trail.emitting = PlayerMovement.GroundCollision && rb.velocity.magnitude >= 1;
-
+        trail.emitting   = PlayerMovement.GroundCollision && rb.velocity.magnitude >= 1;
         trail.startWidth = isSnowman ? walkTrailSize : rollTrailSize;
 
         if (PlayerMovement.GroundCollision)

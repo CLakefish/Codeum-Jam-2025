@@ -284,7 +284,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 1
   m_Constraints: 112
-  m_CollisionDetection: 2
+  m_CollisionDetection: 3
 --- !u!1 &4962997708126977312
 GameObject:
   m_ObjectHideFlags: 0
@@ -322,8 +322,8 @@ Transform:
   - {fileID: 634825721020455469}
   - {fileID: 3996995060636650248}
   - {fileID: 3932839769509309893}
-  - {fileID: 89745704695758039}
   - {fileID: 2361528492222840711}
+  - {fileID: 89745704695758039}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3682014680447002597
@@ -1075,6 +1075,46 @@ PrefabInstance:
       propertyPath: m_Name
       value: Thermometer
       objectReference: {fileID: 0}
+    - target: {fileID: 8009727805846850184, guid: 53c5937ecc4cd1349b8d84aca75b9e03,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8256481367384921311, guid: 53c5937ecc4cd1349b8d84aca75b9e03,
+        type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 7118694352382091937}
+    - target: {fileID: 8256481367384921311, guid: 53c5937ecc4cd1349b8d84aca75b9e03,
+        type: 3}
+      propertyPath: m_RenderMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8256481367384921311, guid: 53c5937ecc4cd1349b8d84aca75b9e03,
+        type: 3}
+      propertyPath: m_PixelPerfect
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8256481367384921311, guid: 53c5937ecc4cd1349b8d84aca75b9e03,
+        type: 3}
+      propertyPath: m_PlaneDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8256481367384921311, guid: 53c5937ecc4cd1349b8d84aca75b9e03,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: 1914650537
+      objectReference: {fileID: 0}
+    - target: {fileID: 8256481367384921311, guid: 53c5937ecc4cd1349b8d84aca75b9e03,
+        type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8256481367384921311, guid: 53c5937ecc4cd1349b8d84aca75b9e03,
+        type: 3}
+      propertyPath: m_UpdateRectTransformForStandalone
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1109,7 +1149,7 @@ PrefabInstance:
     - target: {fileID: 1251963727372041476, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 645
+      value: 651
       objectReference: {fileID: 0}
     - target: {fileID: 1391622197833883145, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1134,12 +1174,12 @@ PrefabInstance:
     - target: {fileID: 3997494044973895901, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1096
+      value: 1102
       objectReference: {fileID: 0}
     - target: {fileID: 4399727029996965993, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1096
+      value: 1102
       objectReference: {fileID: 0}
     - target: {fileID: 4590368413930830086, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1159,7 +1199,7 @@ PrefabInstance:
     - target: {fileID: 5659855733032983859, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1096
+      value: 1102
       objectReference: {fileID: 0}
     - target: {fileID: 6047366502352455182, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1219,7 +1259,7 @@ PrefabInstance:
     - target: {fileID: 7061055210735147474, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1096
+      value: 1102
       objectReference: {fileID: 0}
     - target: {fileID: 7750142014312290844, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1234,7 +1274,7 @@ PrefabInstance:
     - target: {fileID: 8439780689196593512, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_VersionIndex
-      value: 1360
+      value: 1366
       objectReference: {fileID: 0}
     - target: {fileID: 8439780689196593512, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1598,6 +1638,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7967109859125513962, guid: d908ab252b6d229468c68acfb988be8e,
+        type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 7118694352382091937}
+    - target: {fileID: 7967109859125513962, guid: d908ab252b6d229468c68acfb988be8e,
+        type: 3}
+      propertyPath: m_RenderMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7967109859125513962, guid: d908ab252b6d229468c68acfb988be8e,
+        type: 3}
+      propertyPath: m_PlaneDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7967109859125513962, guid: d908ab252b6d229468c68acfb988be8e,
+        type: 3}
+      propertyPath: m_SortingLayerID
+      value: 1914650537
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
