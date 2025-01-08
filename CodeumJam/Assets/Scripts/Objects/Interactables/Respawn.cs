@@ -46,6 +46,11 @@ public class Respawn : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
+        HandleRespawn(other);
+    }
+
+    public void HandleRespawn(Collider other)
+    {
         if (other.attachedRigidbody == null) return;
 
         switch (other.gameObject.tag)

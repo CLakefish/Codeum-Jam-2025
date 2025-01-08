@@ -15,6 +15,7 @@ public class PlayerMovement : Player.PlayerComponent
 
     [Header("Rolling Collision")]
     [SerializeField] private float rollBounceCastDistance;
+    [SerializeField] private float rollCastInterpolateSpeed;
 
     [Header("Gravity")]
     [SerializeField] private float gravityForce;
@@ -444,6 +445,9 @@ public class PlayerMovement : Player.PlayerComponent
 
     private class RollingStateMachine : StateMachine<PlayerMovement>
     {
+        private Vector3 castDir;
+        private Vector3 dirVel;
+
         public RollingStateMachine(PlayerMovement context, StateMachine<PlayerMovement> parent) : base(context, parent) { }
 
         public override void Enter() {
@@ -462,6 +466,8 @@ public class PlayerMovement : Player.PlayerComponent
                 context.PlayerCamera.AddFOV(context.PlayerCamera.rollBoostFOV);
             }
 
+            castDir = context.MomentumNoY.normalized;
+
             base.Enter();
         }
 
@@ -470,6 +476,8 @@ public class PlayerMovement : Player.PlayerComponent
 
             context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.ballSmoothing);
             context.PlayerCamera.AddFOV(context.rb.velocity.magnitude / context.PlayerCamera.rollFOVReduction);
+
+            castDir = Vector3.SmoothDamp(castDir, context.MomentumNoY, ref dirVel, context.rollCastInterpolateSpeed);
 
             base.Update();
         }
@@ -485,25 +493,18 @@ public class PlayerMovement : Player.PlayerComponent
                 }
             }
 
-            foreach (Vector3 dir in new Vector3[2] {
-                context.MomentumNoY.normalized,
-                context.MoveDir,
-            })
+            if (Physics.SphereCast(context.rb.position, context.SphereCollider.radius - 0.1f, castDir.normalized, out RaycastHit hit, context.rollBounceCastDistance, context.GroundLayer))
             {
-                if (Physics.SphereCast(context.rb.position, context.SphereCollider.radius - 0.1f, dir, out RaycastHit hit, context.rollBounceCastDistance, context.GroundLayer))
+                float angle = Vector3.Angle(Vector3.up, hit.normal);
+
+                if (angle >= context.rollMinBounceAngle && !hit.collider.CompareTag("NoBounce"))
                 {
-                    float angle = Vector3.Angle(Vector3.up, hit.normal);
+                    Vector3 rotatedVel = Vector3.Reflect(context.rb.velocity, hit.normal);
+                    rotatedVel.y = 0;
+                    rotatedVel = rotatedVel.normalized * Mathf.Max(context.rb.velocity.magnitude, context.rollIdleSpeed);
+                    context.rb.velocity = rotatedVel;
 
-                    if (angle >= context.rollMinBounceAngle && !hit.collider.CompareTag("NoBounce"))
-                    {
-                        Vector3 rotatedVel = Vector3.Reflect(context.rb.velocity, hit.normal);
-                        rotatedVel.y = 0;
-                        rotatedVel = rotatedVel.normalized * Mathf.Max(context.rb.velocity.magnitude, context.rollIdleSpeed);
-                        context.rb.velocity = rotatedVel;
-
-                        context.HitWall?.Invoke();
-                        break;
-                    }
+                    context.HitWall?.Invoke();
                 }
             }
 

@@ -26,6 +26,8 @@ public class PlayerViewmodel : Player.PlayerComponent
     [SerializeField] private float viewmodelSmoothing;
     [SerializeField] private float snowManShadowSize;
     [SerializeField] private float snowBallShadowSize;
+    [SerializeField] private float snowBallSizeSmoothing;
+    private Coroutine swapEffect;
 
     public GameObject Viewmodel {
         get {
@@ -44,6 +46,8 @@ public class PlayerViewmodel : Player.PlayerComponent
 
     private void Start()
     {
+        snowBall.transform.localScale = Vector3.zero;
+
         PlayerMovement.OnJump += () => {
             snowManAnimator.SetBool("Jump", true);
             Instantiate(jumpParticle, new Vector3(rb.position.x, PlayerMovement.GroundPoint.y, rb.position.z), Quaternion.identity);
@@ -117,8 +121,8 @@ public class PlayerViewmodel : Player.PlayerComponent
             prevRollRotation = rb.rotation;
         }
 
-        snowBall.SetActive(active);
-        snowMan.SetActive(!active);
+        if (swapEffect != null) StopCoroutine(swapEffect);
+        swapEffect = StartCoroutine(SwapEffect(active));
     }
 
     public void TurnOff()
@@ -141,6 +145,24 @@ public class PlayerViewmodel : Player.PlayerComponent
         TurnOff();
         trail.emitting = false;
 
-        ParticleSystem explosion = Instantiate(explodeParticle, rb.transform.position, Quaternion.identity);
+        Instantiate(explodeParticle, rb.transform.position, Quaternion.identity);
+    }
+
+    private IEnumerator SwapEffect(bool active)
+    {
+        snowBall.SetActive(true);
+        snowMan.SetActive(true);
+
+        Vector3 ballVel         = Vector3.zero;
+        Vector3 desiredBallSize = Vector3.one * (active ? 1 : 0);
+
+        while (Vector3.Distance(snowBall.transform.localScale, desiredBallSize) > 0.005f)
+        {
+            snowBall.transform.localScale = Vector3.SmoothDamp(snowBall.transform.localScale, desiredBallSize, ref ballVel, snowBallSizeSmoothing);
+            yield return null;
+        }
+
+        snowMan.SetActive(!active);
+        snowBall.SetActive(active);
     }
 }
