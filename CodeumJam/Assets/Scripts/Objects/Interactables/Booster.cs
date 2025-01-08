@@ -4,15 +4,12 @@ using UnityEngine;
 
 public class Booster : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private float boostForce;
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerStay(Collider other)
     {
-        
+        if (other.attachedRigidbody == null) return;
+
+        other.attachedRigidbody.velocity += other.attachedRigidbody.velocity.normalized * (boostForce * Time.deltaTime);
     }
 }

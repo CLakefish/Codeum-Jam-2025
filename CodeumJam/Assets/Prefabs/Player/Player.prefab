@@ -421,7 +421,7 @@ MonoBehaviour:
   rotationSmoothing: 0.01
   positionSmoothing: 0.1
   positionCorrectSpeed: 0.3
-  ballSmoothing: 0.04
+  ballSmoothing: 0.06
   FOVInterpolation: 0.05
   distance: 5
   yOffset: 0

@@ -474,8 +474,8 @@ public class PlayerMovement : Player.PlayerComponent
         public override void Update() {
             CheckTransitions();
 
-            context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.ballSmoothing);
             context.PlayerCamera.AddFOV(context.rb.velocity.magnitude / context.PlayerCamera.rollFOVReduction);
+            context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.ballSmoothing);
 
             castDir = Vector3.SmoothDamp(castDir, context.MomentumNoY, ref dirVel, context.rollCastInterpolateSpeed);
 
@@ -492,6 +492,8 @@ public class PlayerMovement : Player.PlayerComponent
                     p.Launch(context.rb.position);
                 }
             }
+
+            context.ApplyGravity();
 
             if (Physics.SphereCast(context.rb.position, context.SphereCollider.radius - 0.1f, castDir.normalized, out RaycastHit hit, context.rollBounceCastDistance, context.GroundLayer))
             {
@@ -517,8 +519,6 @@ public class PlayerMovement : Player.PlayerComponent
                 newVel.y = context.rb.velocity.y;
                 context.rb.velocity = newVel;
             }
-
-            context.ApplyGravity();
 
             base.FixedUpdate();
         }
