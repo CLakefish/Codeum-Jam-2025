@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 5551495607227623460}
   m_Layer: 6
   m_Name: Box
-  m_TagString: Collidable
+  m_TagString: NoBounce
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -403,7 +403,8 @@ MonoBehaviour:
   onLaunch:
     m_PersistentCalls:
       m_Calls: []
-  launchForce: 30
+  rb: {fileID: 1129231043911639029}
+  isKinematic: 0
+  launchForce: 35
   heightForce: 20
   gravityForce: 48
-  rb: {fileID: 1129231043911639029}

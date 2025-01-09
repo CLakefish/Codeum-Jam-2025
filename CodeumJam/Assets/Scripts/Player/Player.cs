@@ -12,6 +12,9 @@ public class Player : MonoBehaviour
     [SerializeField] protected PlayerInput     playerInput;
     [SerializeField] private   PlayerViewmodel playerViewmodel;
 
+    [Header("Player UI")]
+    [SerializeField] public PlayerThermometer playerThermometer;
+
     [Header("Player Physics")]
     [SerializeField] private Rigidbody       rb;
     [SerializeField] private CapsuleCollider capsuleCollider;
@@ -22,6 +25,8 @@ public class Player : MonoBehaviour
     [Header("Player Camera")]
     [SerializeField] private Camera cam;
 
+    public bool IsSnowman => playerViewmodel.IsSnowman;
+
     private void Awake()
     {
         Instance = this;
@@ -30,11 +35,12 @@ public class Player : MonoBehaviour
         playerCamera.SetPlayer(this);
         playerInput.SetPlayer(this);
         playerViewmodel.SetPlayer(this);
+
+        playerViewmodel.TurnOff();
     }
 
     public void AllowMovement(bool allow)
     {
-        if (CutsceneManager.Instance.CutscenePlaying) return;
         playerMovement.enabled    = allow;
         playerViewmodel.canRotate = allow;
     }
@@ -43,6 +49,15 @@ public class Player : MonoBehaviour
     {
         playerCamera.canRotate = allow;
         playerCamera.SetParent(allow);
+    }
+
+    public void SetSpawn(Vector3 pos) => rb.transform.position = pos;
+    public void RespawnPlayer()       => CutsceneManager.Instance.TriggerCutscene(CutsceneManager.CutsceneType.Respawn);
+
+    public void Explode() {
+        playerViewmodel.Explode();
+        AllowMovement(false);
+        rb.velocity = Vector3.zero;
     }
 
     public PlayerMovement GetMovement() {

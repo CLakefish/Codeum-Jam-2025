@@ -17,7 +17,9 @@ public class PlayerCamera : Player.PlayerComponent
 
     [Header("Interpolation")]
     [SerializeField] private float rotationSmoothing;
-    [SerializeField] private float positionSmoothing;
+    [SerializeField] public float  positionSmoothing;
+    [SerializeField] public float  positionCorrectSpeed;
+    [SerializeField] public float  ballSmoothing;
     [SerializeField] private float FOVInterpolation;
 
     [Header("Offsets and Bounds")]
@@ -66,7 +68,7 @@ public class PlayerCamera : Player.PlayerComponent
 
         CheckDist();
 
-        Camera.fieldOfView = Mathf.SmoothDamp(Camera.fieldOfView, currentFOV, ref fovVel, FOVInterpolation);
+        Camera.fieldOfView = Mathf.Clamp(Mathf.SmoothDamp(Camera.fieldOfView, currentFOV, ref fovVel, FOVInterpolation), 0, 130);
     }
 
     private void OnDrawGizmos()
@@ -109,11 +111,11 @@ public class PlayerCamera : Player.PlayerComponent
         if (Mathf.Abs(dir.z) > boxSize.z / 2.0f) boxPosition.z = rb.transform.position.z - Mathf.Sign(dir.z) * (boxSize.z / 2.0f);
     }
 
-    public void SetBoxBoundBottom()
+    public void SetBoxBoundBottom(float speed)
     {
         Vector3 pos    = new(boxPosition.x, rb.transform.position.y, boxPosition.z);
         Vector3 offset = pos + (Vector3.up * (boxSize.y / 2.0f)) - Vector3.up;
-        boxPosition    = new Vector3(offset.x, Mathf.SmoothDamp(boxPosition.y, offset.y, ref yVel, positionSmoothing), offset.z);
+        boxPosition    = new Vector3(offset.x, Mathf.SmoothDamp(boxPosition.y, offset.y, ref yVel, speed), offset.z);
     }
 
     public void SetParent(bool parentPivot) => Camera.transform.parent = parentPivot ? pivot.transform : null;

@@ -16,11 +16,13 @@ public class RespawnEditor : Editor
     }
 }
 
-
 #endif
 
 public class Respawn : MonoBehaviour
 {
+    public static Respawn Instance { get; private set; }
+
+
     [SerializeField] private Vector3 spawnPosition;
 
     public Vector3 SpawnPosition => spawnPosition;
@@ -32,24 +34,41 @@ public class Respawn : MonoBehaviour
         Gizmos.DrawSphere(SpawnPosition, 0.1f);
     }
 
+    private void Awake()
+    {
+        if (Instance != null) return;
+        Instance = this;
+    }
+
+    private void Start() {
+        Player.Instance.SetSpawn(SpawnPosition);
+    }
+
     private void OnTriggerStay(Collider other)
+    {
+        HandleRespawn(other);
+    }
+
+    public void HandleRespawn(Collider other)
     {
         if (other.attachedRigidbody == null) return;
 
         switch (other.gameObject.tag)
         {
             case "Player":
-                LevelManager.Instance.ResetAll();
-                other.transform.position = spawnPosition;
+                RespawnPlayer();
                 break;
 
             case "Collidable":
                 other.gameObject.SetActive(false);
                 break;
-
-            default:
-                other.transform.position = spawnPosition;
-                break;
         }
+    }
+
+    public void RespawnPlayer()
+    {
+        LevelManager.Instance.ResetAll();
+        Player.Instance.SetSpawn(SpawnPosition);
+        Player.Instance.RespawnPlayer();
     }
 }

@@ -9,11 +9,25 @@ public class PlayerViewmodel : Player.PlayerComponent
     [SerializeField] private GameObject snowMan;
     [SerializeField] private GameObject snowBall;
     [SerializeField] private GameObject shadow;
+    [SerializeField] public Animator snowManAnimator;
+
+    [Header("Trail")]
+    [SerializeField] private TrailRenderer trail;
+    [SerializeField] private float walkTrailSize;
+    [SerializeField] private float rollTrailSize;
+
+    [Header("Particles")]
+    [SerializeField] private ParticleSystem landParticle;
+    [SerializeField] private ParticleSystem jumpParticle;
+    [SerializeField] private ParticleSystem hitWallParticle;
+    [SerializeField] private ParticleSystem explodeParticle;
 
     [Header("Smoothing")]
     [SerializeField] private float viewmodelSmoothing;
     [SerializeField] private float snowManShadowSize;
     [SerializeField] private float snowBallShadowSize;
+    [SerializeField] private float snowBallSizeSmoothing;
+    private Coroutine swapEffect;
 
     public GameObject Viewmodel {
         get {
@@ -22,14 +36,32 @@ public class PlayerViewmodel : Player.PlayerComponent
     }
 
     public bool IsSnowman => isSnowman;
+    public bool canRotate = true;
 
     private const float Z_FIGHTING_PUSH = 0.015f;
 
-    private bool isSnowman = true;
-    public bool canRotate  = true;
+    private Quaternion prevRollRotation = Quaternion.identity;
     private float viewmodelVel = 0;
+    private bool isSnowman = true;
 
-    private Quaternion prevRollRotation;
+    private void Start()
+    {
+        snowBall.transform.localScale = Vector3.zero;
+
+        PlayerMovement.OnJump += () => {
+            snowManAnimator.SetBool("Jump", true);
+            Instantiate(jumpParticle, new Vector3(rb.position.x, PlayerMovement.GroundPoint.y, rb.position.z), Quaternion.identity);
+        };
+
+        PlayerMovement.HitGround += () => {
+            snowManAnimator.SetBool("Grounded", true);
+            Instantiate(landParticle, new Vector3(rb.position.x, PlayerMovement.GroundPoint.y, rb.position.z), Quaternion.identity);
+        };
+
+        PlayerMovement.HitWall += () => {
+            Instantiate(hitWallParticle, rb.transform.position, Quaternion.identity);
+        };
+    }
 
     private void Update()
     {
@@ -55,9 +87,19 @@ public class PlayerViewmodel : Player.PlayerComponent
 
     private void FixedUpdate()
     {
-        if (!IsSnowman) {
-            rb.angularVelocity = Quaternion.Euler(0, 90, 0) * rb.velocity;
-            snowBall.transform.rotation = rb.rotation;
+        trail.emitting   = PlayerMovement.GroundCollision && rb.velocity.magnitude >= 1;
+        trail.startWidth = isSnowman ? walkTrailSize : rollTrailSize;
+
+        if (PlayerMovement.GroundCollision)
+        {
+            trail.transform.position = new Vector3(trail.transform.position.x, PlayerMovement.GroundPoint.y + 0.1f, trail.transform.position.z);
+            trail.transform.forward  = -PlayerMovement.GroundNormal;
+        }
+
+        if (IsSnowman) {
+            snowManAnimator.SetBool("Jump", PlayerMovement.IsJumping);
+            snowManAnimator.SetBool("Grounded", PlayerMovement.GroundCollision);
+            snowManAnimator.SetBool("Falling", !PlayerMovement.GroundCollision);
         }
     }
 
@@ -78,7 +120,48 @@ public class PlayerViewmodel : Player.PlayerComponent
             prevRollRotation = rb.rotation;
         }
 
-        snowBall.SetActive(active);
+        if (swapEffect != null) StopCoroutine(swapEffect);
+        swapEffect = StartCoroutine(SwapEffect(active));
+    }
+
+    public void TurnOff()
+    {
+        snowMan.SetActive(false);
+        snowBall.SetActive(false);
+        shadow.SetActive(false);
+    }
+
+    public void Respawn()
+    {
+        snowBall.SetActive(false);
+        snowMan.SetActive(true);
+        shadow.SetActive(true);
+        snowManAnimator.SetTrigger("Spawn");
+    }
+
+    public void Explode()
+    {
+        TurnOff();
+        trail.emitting = false;
+
+        Instantiate(explodeParticle, rb.transform.position, Quaternion.identity);
+    }
+
+    private IEnumerator SwapEffect(bool active)
+    {
+        snowBall.SetActive(true);
+        snowMan.SetActive(true);
+
+        Vector3 ballVel         = Vector3.zero;
+        Vector3 desiredBallSize = Vector3.one * (active ? 1 : 0);
+
+        while (Vector3.Distance(snowBall.transform.localScale, desiredBallSize) > 0.005f)
+        {
+            snowBall.transform.localScale = Vector3.SmoothDamp(snowBall.transform.localScale, desiredBallSize, ref ballVel, snowBallSizeSmoothing);
+            yield return null;
+        }
+
         snowMan.SetActive(!active);
+        snowBall.SetActive(active);
     }
 }

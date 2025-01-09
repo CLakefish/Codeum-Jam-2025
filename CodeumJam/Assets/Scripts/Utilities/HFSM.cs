@@ -46,19 +46,20 @@ namespace HFSMFramework
             return parent == null ? this : parent.GetParent();
         }
 
-        public virtual void Enter() { }
-        public virtual void Exit()  { }
+        public virtual void Enter() {
+            Duration = 0;
+        }
 
-        public virtual void Update()
-        {
+        public virtual void Update() {
             CurrentState?.Update();
             Duration += Time.deltaTime;
         }
 
-        public virtual void FixedUpdate()
-        {
+        public virtual void FixedUpdate() {
             CurrentState?.FixedUpdate();
         }
+
+        public virtual void Exit() { }
 
         public void SetStartState(IState startState)
         {

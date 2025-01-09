@@ -891,7 +891,7 @@ GameObject:
   - component: {fileID: 767486500326084302}
   m_Layer: 6
   m_Name: Garbage Can
-  m_TagString: Collidable
+  m_TagString: NoBounce
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
