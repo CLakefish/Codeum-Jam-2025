@@ -447,7 +447,7 @@ MonoBehaviour:
   wallCastIncrement: 8
   wallCastDistance: 0.8
   rollBounceCastDistance: 1.2
-  rollCastInterpolateSpeed: 0.05
+  rollCastInterpolateSpeed: 0.01
   gravityForce: 48
   moveSpeed: 16
   acceleration: 100
@@ -559,7 +559,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3723240020988675584}
   - component: {fileID: 4030579952334626948}
-  m_Layer: 2
+  m_Layer: 1
   m_Name: Slide trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -703,7 +703,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3932839769509309893}
-  m_Layer: 2
+  m_Layer: 1
   m_Name: Viewmodel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -740,7 +740,7 @@ GameObject:
   - component: {fileID: 220569748598032260}
   - component: {fileID: 5620574872243614897}
   - component: {fileID: 5375462562334644808}
-  m_Layer: 2
+  m_Layer: 1
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -811,7 +811,7 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 115
+    m_Bits: 113
   m_RenderingLayerMask: 1
   m_Lightmapping: 4
   m_LightShadowCasterMode: 0
@@ -1159,12 +1159,12 @@ PrefabInstance:
     - target: {fileID: 2331597965570862659, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_Layer
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2364165076020956360, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_Layer
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3400694757300212858, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1184,17 +1184,17 @@ PrefabInstance:
     - target: {fileID: 4590368413930830086, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_Layer
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5242082126317521138, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_Layer
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5296307190523344334, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_Layer
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5659855733032983859, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1261,15 +1261,10 @@ PrefabInstance:
       propertyPath: m_VersionIndex
       value: 1102
       objectReference: {fileID: 0}
-    - target: {fileID: 7750142014312290844, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
-        type: 3}
-      propertyPath: m_Layer
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 8373078760602018020, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
       propertyPath: m_Layer
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8439780689196593512, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
         type: 3}
@@ -1446,6 +1441,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Movement Particle
+      objectReference: {fileID: 0}
+    - target: {fileID: 6970306427563819109, guid: 945585a5f60e77e41925ee17e71932eb,
+        type: 3}
+      propertyPath: m_Layer
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

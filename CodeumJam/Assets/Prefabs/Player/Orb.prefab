@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5327130857681285236}
-  m_Layer: 2
+  m_Layer: 1
   m_Name: Orb
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 5926702126045944155}
   - component: {fileID: 4009154379486859524}
   - component: {fileID: 7509291225549042522}
-  m_Layer: 2
+  m_Layer: 1
   m_Name: Sphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}

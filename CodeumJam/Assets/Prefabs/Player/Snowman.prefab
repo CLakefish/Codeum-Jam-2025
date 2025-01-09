@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6047366502352455182}
   - component: {fileID: 642503464077234342}
-  m_Layer: 2
+  m_Layer: 1
   m_Name: Snowman
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4644,7 +4644,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4889420727942957581}
-  m_Layer: 0
+  m_Layer: 1
   m_Name: LeftTwig
   m_TagString: Untagged
   m_Icon: {fileID: 0}
