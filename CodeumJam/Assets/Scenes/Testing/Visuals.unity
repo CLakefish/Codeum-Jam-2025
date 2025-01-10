@@ -25172,6 +25172,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: MenuUI
       objectReference: {fileID: 0}
+    - target: {fileID: 4465065826142768309, guid: 3b280b09c0f4d4647ae43b5f1cb4108b,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4888678498774179138, guid: 3b280b09c0f4d4647ae43b5f1cb4108b,
         type: 3}
       propertyPath: m_TargetGraphic

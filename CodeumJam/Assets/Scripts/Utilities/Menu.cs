@@ -71,6 +71,7 @@ public class Menu : MonoBehaviour
     public void SwitchtoScene(int sceneId)
     {
         CloseMenu();
+        player.GetComponent<PlayerInput>().MouseLock = false;
         SceneManager.LoadScene(sceneId);
     }
     private void Setup()
