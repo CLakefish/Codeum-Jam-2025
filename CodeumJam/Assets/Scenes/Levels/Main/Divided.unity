@@ -12784,7 +12784,7 @@ PrefabInstance:
     - target: {fileID: 6591973115742188519, guid: f928f32452ed10746992be3c9bc738b0,
         type: 3}
       propertyPath: verticalForce
-      value: 60
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 7490299080209039354, guid: f928f32452ed10746992be3c9bc738b0,
         type: 3}
@@ -12804,7 +12804,7 @@ PrefabInstance:
     - target: {fileID: 7490299080209039354, guid: f928f32452ed10746992be3c9bc738b0,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -49.25
+      value: -47.45
       objectReference: {fileID: 0}
     - target: {fileID: 7490299080209039354, guid: f928f32452ed10746992be3c9bc738b0,
         type: 3}
@@ -12814,7 +12814,7 @@ PrefabInstance:
     - target: {fileID: 7490299080209039354, guid: f928f32452ed10746992be3c9bc738b0,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 317.65
+      value: 310.89
       objectReference: {fileID: 0}
     - target: {fileID: 7490299080209039354, guid: f928f32452ed10746992be3c9bc738b0,
         type: 3}
@@ -48853,6 +48853,18 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2368379461109106990, guid: a93298fd51f2aa242905f72378431e35,
+        type: 3}
+      propertyPath: levelToGoTo
+      value: 
+      objectReference: {fileID: 11400000, guid: fe089c3f64c849c4998ef23b73a87f9d,
+        type: 2}
+    - target: {fileID: 2368379461109106990, guid: a93298fd51f2aa242905f72378431e35,
+        type: 3}
+      propertyPath: currentLevel
+      value: 
+      objectReference: {fileID: 11400000, guid: 8d98693b2ddbe1146ab132435d02ffd2,
+        type: 2}
     - target: {fileID: 2547134733079473774, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: m_Mesh
@@ -48958,6 +48970,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 1534393027}
+    - target: {fileID: 7239739351102615266, guid: a93298fd51f2aa242905f72378431e35,
+        type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 7743898005491027823, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
       propertyPath: m_Mesh

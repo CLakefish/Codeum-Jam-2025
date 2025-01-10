@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tutorial
   m_EditorClassIdentifier: 
   sceneName: Tutorial
-  displaySprite: {fileID: 21300000, guid: 92c50cd3d54e91b4997756d6fd328134, type: 3}
+  displaySprite: {fileID: 21300000, guid: f08d00e1db6e8264f9dbff5d38d527b6, type: 3}
   displayName: Tutorial
   description: Learn how to explode
   completedMessages:

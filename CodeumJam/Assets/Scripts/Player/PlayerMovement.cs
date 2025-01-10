@@ -182,7 +182,7 @@ public class PlayerMovement : Player.PlayerComponent
     }
 
     #region Debugging
-
+    /*
     private void OnGUI()
     {
         fsm.OnGUI();
@@ -204,7 +204,7 @@ public class PlayerMovement : Player.PlayerComponent
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(rb.transform.position + (Vector3.down * fallCastDist), castRadius);
     }
-
+    */
     #endregion
 
     #region Movement

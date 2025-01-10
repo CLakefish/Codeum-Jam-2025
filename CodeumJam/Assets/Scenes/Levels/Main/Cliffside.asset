@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Cliffside
   m_EditorClassIdentifier: 
   sceneName: Cliffside
-  displaySprite: {fileID: 21300000, guid: 92c50cd3d54e91b4997756d6fd328134, type: 3}
+  displaySprite: {fileID: 21300000, guid: 7463c60a99b13a44f83a6f0ffc031d43, type: 3}
   displayName: Cliffside
   description: Hitting walls doesnt hurt. I promise
   completedMessages:

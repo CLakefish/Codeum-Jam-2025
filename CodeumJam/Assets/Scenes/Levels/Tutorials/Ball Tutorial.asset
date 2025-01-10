@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Ball Tutorial
   m_EditorClassIdentifier: 
   sceneName: BallTutorial
-  displaySprite: {fileID: 21300000, guid: 92c50cd3d54e91b4997756d6fd328134, type: 3}
+  displaySprite: {fileID: 21300000, guid: e530d1286e23b6549a9e7ec8a43ef8ea, type: 3}
   displayName: Ball Tutorial
   description: Learn how to bounce off walls
   completedMessages:

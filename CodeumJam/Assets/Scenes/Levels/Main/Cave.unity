@@ -39521,7 +39521,7 @@ PrefabInstance:
         type: 3}
       propertyPath: levelToGoTo
       value: 
-      objectReference: {fileID: 11400000, guid: fe089c3f64c849c4998ef23b73a87f9d,
+      objectReference: {fileID: 11400000, guid: 8d98693b2ddbe1146ab132435d02ffd2,
         type: 2}
     - target: {fileID: 2368379461109106990, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}
@@ -39663,6 +39663,11 @@ PrefabInstance:
         type: 3}
       propertyPath: introPositions.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7239739351102615266, guid: a93298fd51f2aa242905f72378431e35,
+        type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 7576052039014682727, guid: a93298fd51f2aa242905f72378431e35,
         type: 3}

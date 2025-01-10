@@ -10,12 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: faf00a3ead4b51e4eac207ccf32662ad, type: 3}
-  m_Name: Rush
+  m_Name: Visuals
   m_EditorClassIdentifier: 
-  sceneName: Rush
-  displaySprite: {fileID: 21300000, guid: da2e079bcaf94954090f453516d4aad3, type: 3}
-  displayName: Rush
-  description: I love drinking -12 degree water
+  sceneName: Visuals
+  displaySprite: {fileID: 21300000, guid: 92c50cd3d54e91b4997756d6fd328134, type: 3}
+  displayName: Celebration
+  description: No more fires!
   completedMessages:
-  - Congration. You did.
-  - You it did
+  - Woah

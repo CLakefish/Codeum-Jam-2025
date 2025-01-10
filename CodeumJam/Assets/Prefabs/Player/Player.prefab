@@ -1115,12 +1115,12 @@ PrefabInstance:
     - target: {fileID: 8256481367384921311, guid: 53c5937ecc4cd1349b8d84aca75b9e03,
         type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
-      value: 25
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8256481367384921311, guid: 53c5937ecc4cd1349b8d84aca75b9e03,
         type: 3}
       propertyPath: m_UpdateRectTransformForStandalone
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

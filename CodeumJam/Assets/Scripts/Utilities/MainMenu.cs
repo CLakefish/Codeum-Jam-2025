@@ -12,16 +12,17 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private GameObject[] menuPanels;
     [SerializeField] private LevelScriptableObject[] levelArray;
     [SerializeField] private TextMeshProUGUI LevelText;
-
+    [SerializeField] private Image image;
 
     private int Levelid = 0;
 
     // Start is called before the first frame update
     void Start()
     {
-        
         ChangeScene(0);
         VolumeSlider.value = Load("Volume");
+
+        image.sprite = levelArray[0].DisplaySprite;
     }
 
     // Update is called once per frame
@@ -32,7 +33,7 @@ public class MainMenu : MonoBehaviour
 
     public void ChangeLevel(int change)
     {
-        if(change == 1)
+        if (change == 1)
         {
             if(Levelid == levelArray.Length-1)
             {
@@ -54,6 +55,8 @@ public class MainMenu : MonoBehaviour
                 Levelid--;
             }
         }
+
+        image.sprite = levelArray[Levelid].DisplaySprite;
     }
     public void ChangeScene(int Sceneid)
     {
@@ -67,7 +70,7 @@ public class MainMenu : MonoBehaviour
 
     public void LevelInfo()
     {
-        LevelText.text = levelArray[Levelid].name;
+        LevelText.text = levelArray[Levelid].DisplayName;
     }
 
     public void StartLevel()
