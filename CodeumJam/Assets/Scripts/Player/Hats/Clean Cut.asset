@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816c6e89bd641f240ba5bc93bc87faf5, type: 3}
+  m_Name: Clean Cut
+  m_EditorClassIdentifier: 
+  id: Clean Cut
+  hatObject: {fileID: 5517623963461105863, guid: 06e8e16d92c70464cb376da107b81d85,
+    type: 3}

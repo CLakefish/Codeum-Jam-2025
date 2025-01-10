@@ -383,6 +383,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   viewmodel: {fileID: 3932839769509309893}
   snowMan: {fileID: 938944323205619726}
+  snowManHead: {fileID: 4471153143307718724}
   snowBall: {fileID: 4604523423004037194}
   shadow: {fileID: 5430579036259701492}
   snowManAnimator: {fileID: 1638576444448550561}
@@ -401,6 +402,11 @@ MonoBehaviour:
   snowManShadowSize: 1
   snowBallShadowSize: 1.75
   snowBallSizeSmoothing: 0.025
+  hats:
+  - {fileID: 11400000, guid: 17c04af7c0a648342b19248e0afb832b, type: 2}
+  - {fileID: 11400000, guid: d5682327bcc68aa469f0f6d2a1a50e5d, type: 2}
+  - {fileID: 11400000, guid: ddef64a7d89b7f049bf72102fa47e8df, type: 2}
+  - {fileID: 11400000, guid: 6721796904c298a449a3e027c163b98e, type: 2}
   canRotate: 0
 --- !u!114 &5965798720975813070
 MonoBehaviour:
@@ -1301,6 +1307,12 @@ GameObject:
 --- !u!95 &1638576444448550561 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 642503464077234342, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
+    type: 3}
+  m_PrefabInstance: {fileID: 2186433740776259079}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4471153143307718724 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2331597965570862659, guid: b58ea093f21c83b4a89bcc82ed2ffb49,
     type: 3}
   m_PrefabInstance: {fileID: 2186433740776259079}
   m_PrefabAsset: {fileID: 0}

@@ -7,6 +7,7 @@ public class PlayerViewmodel : Player.PlayerComponent
     [Header("Viewmodels")]
     [SerializeField] private Transform viewmodel;
     [SerializeField] private GameObject snowMan;
+    [SerializeField] private GameObject snowManHead;
     [SerializeField] private GameObject snowBall;
     [SerializeField] private GameObject shadow;
     [SerializeField] public Animator snowManAnimator;
@@ -29,6 +30,11 @@ public class PlayerViewmodel : Player.PlayerComponent
     [SerializeField] private float snowBallSizeSmoothing;
     private Coroutine swapEffect;
 
+    [Header("Hats")]
+    [SerializeField] private List<Hat> hats = new();
+    private Hat currentHat;
+    private GameObject currentHatObject;
+
     public GameObject Viewmodel {
         get {
             return IsSnowman ? snowMan : snowBall;
@@ -43,6 +49,14 @@ public class PlayerViewmodel : Player.PlayerComponent
     private Quaternion prevRollRotation = Quaternion.identity;
     private float viewmodelVel = 0;
     private bool isSnowman = true;
+
+    private void Awake()
+    {
+        if (PlayerPrefs.HasKey("hat"))
+        {
+            EquipHat(PlayerPrefs.GetString("hat"));
+        }
+    }
 
     private void Start()
     {
@@ -163,5 +177,21 @@ public class PlayerViewmodel : Player.PlayerComponent
 
         snowMan.SetActive(!active);
         snowBall.SetActive(active);
+    }
+
+    public void EquipHat(string ID)
+    {
+        if (currentHat != null && ID == currentHat.ID) return;
+
+        if (currentHatObject != null) Destroy(currentHatObject);
+
+        var indexedHat = hats.Find(w => w.ID == ID);
+
+        currentHatObject = Instantiate(indexedHat.HatObject, snowManHead.transform);
+        currentHatObject.transform.localEulerAngles = new Vector3(90, 0, 0);
+        currentHatObject.transform.localPosition   -= Vector3.forward * 0.2f;
+        currentHat       = indexedHat;
+
+        PlayerPrefs.SetString("hat", currentHat.ID);
     }
 }
