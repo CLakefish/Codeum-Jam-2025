@@ -160,6 +160,9 @@ public class PlayerMovement : Player.PlayerComponent
         // Since the fsm initial state is not assigned at addition, you have to do it manually. Might change it
         // Initialize HFSM with state
         fsm.SetStartState(Falling);
+
+        CheckGroundCollisions();
+        CheckWallCollisions();
     }
 
     void Update()
@@ -309,12 +312,23 @@ public class PlayerMovement : Player.PlayerComponent
         public override void Enter() {
             context.HitGround?.Invoke();
             context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.positionSmoothing);
+
+            if (context.fsm.PreviousState == context.Falling) context.PlayerAudio.PlaySound(PlayerAudioClipType.Land, 2);
         }
 
         // Called when state is first created
         // Ensure its marked as "public override void" rather than "public void", else it will not function!
         // Called every update call (done via fsm.Update())
         public override void Update() {
+            if (context.PlayerInput.Inputting)
+            {
+                context.PlayerAudio.PlaySound(PlayerAudioClipType.Walk);
+            }
+            else
+            {
+                context.PlayerAudio.StopLoop();
+            }
+
             context.PlayerCamera.SetBoxBoundBottom(context.PlayerCamera.positionSmoothing);
         }
 
@@ -337,7 +351,9 @@ public class PlayerMovement : Player.PlayerComponent
         }
 
         // Called when the state is changed
-        public override void Exit() { }
+        public override void Exit() {
+            context.PlayerAudio.StopLoop();
+        }
     }
 
     // Same applies to this as above
@@ -348,8 +364,10 @@ public class PlayerMovement : Player.PlayerComponent
         public override void Enter() {
             context.OnJump?.Invoke();
             context.SetY(context.jumpForce);
-            context.jumpBuffer = 0;
+            context.jumpBuffer      = 0;
             context.prevGroundPoint = context.GroundPoint;
+
+            context.PlayerAudio.PlaySound(PlayerAudioClipType.Jump);
         }
 
         public override void Update() {
@@ -401,6 +419,8 @@ public class PlayerMovement : Player.PlayerComponent
 
         public override void Enter()
         {
+            context.PlayerAudio.PlaySound(PlayerAudioClipType.Jump);
+
             context.OnJump?.Invoke();
 
             float normalAngle  = Repeat(Vector3.SignedAngle(context.WallNormal, Vector3.forward, Vector3.up) + 90.0f);
@@ -468,6 +488,8 @@ public class PlayerMovement : Player.PlayerComponent
 
             castDir = context.MomentumNoY.normalized;
 
+            context.PlayerAudio.PlaySound(PlayerAudioClipType.Roll);
+
             base.Enter();
         }
 
@@ -485,11 +507,12 @@ public class PlayerMovement : Player.PlayerComponent
         public override void FixedUpdate() {
             context.rb.angularVelocity = Quaternion.Euler(0, 90, 0) * context.rb.velocity;
 
-            Collider[] colliders = Physics.OverlapSphere(context.rb.position, context.SphereCollider.radius + 0.01f, context.PlayerLayer);
+            Collider[] colliders = Physics.OverlapSphere(context.rb.position, context.SphereCollider.radius + 0.1f, context.PlayerLayer);
 
             foreach (var collider in colliders) {
                 if (collider.TryGetComponent<Launchable>(out Launchable p)) {
                     p.Launch(context.rb.position);
+                    context.PlayerAudio.PlaySound(PlayerAudioClipType.Land);
                 }
             }
 
@@ -506,6 +529,7 @@ public class PlayerMovement : Player.PlayerComponent
                     rotatedVel = rotatedVel.normalized * Mathf.Max(context.rb.velocity.magnitude, context.rollIdleSpeed);
                     context.rb.velocity = rotatedVel;
 
+                    context.PlayerAudio.PlaySound(PlayerAudioClipType.Bounce);
                     context.HitWall?.Invoke();
                 }
             }
@@ -540,6 +564,7 @@ public class PlayerMovement : Player.PlayerComponent
         public RollingWalkState(PlayerMovement context) : base(context) { }
 
         public override void Enter() {
+            context.PlayerAudio.PlaySound(PlayerAudioClipType.Land, 0.75f);
             context.HitWall?.Invoke();
         }
     }
@@ -557,6 +582,8 @@ public class PlayerMovement : Player.PlayerComponent
             else {
                 context.rb.velocity += Vector3.up;
             }
+
+            context.PlayerAudio.PlaySound(PlayerAudioClipType.Jump);
         }
     }
 

@@ -30,6 +30,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Levels/Main/Divided.unity
     guid: 1552b3a431d49684790e8ec3b9168a62
   - enabled: 1
-    path: Assets/Scenes/Levels/Main/Visuals.unity
+    path: Assets/Scenes/Levels/Main/Celebration.unity
     guid: 139add4bf8017a54998078634ee44743
   m_configObjects: {}

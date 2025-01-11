@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Spring : MonoBehaviour
 {
     [SerializeField] private float verticalForce;
+    [SerializeField] UnityEvent onBounce;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -16,6 +18,8 @@ public class Spring : MonoBehaviour
         else {
             other.attachedRigidbody.velocity += Vector3.up * verticalForce;
         }
+
+        onBounce?.Invoke();
     }
 
     private void OnDrawGizmos()

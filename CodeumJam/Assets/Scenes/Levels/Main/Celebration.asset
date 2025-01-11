@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: faf00a3ead4b51e4eac207ccf32662ad, type: 3}
-  m_Name: Visuals
+  m_Name: Celebration
   m_EditorClassIdentifier: 
-  sceneName: Visuals
+  sceneName: Celebration
   displaySprite: {fileID: 21300000, guid: 92c50cd3d54e91b4997756d6fd328134, type: 3}
   displayName: Celebration
   description: No more fires!

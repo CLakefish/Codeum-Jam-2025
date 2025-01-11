@@ -15,6 +15,9 @@ public class Player : MonoBehaviour
     [Header("Player UI")]
     [SerializeField] public PlayerThermometer playerThermometer;
 
+    [Header("Player SFX")]
+    [SerializeField] private PlayerAudio playerAudio;
+
     [Header("Player Physics")]
     [SerializeField] private Rigidbody       rb;
     [SerializeField] private CapsuleCollider capsuleCollider;
@@ -35,6 +38,7 @@ public class Player : MonoBehaviour
         playerCamera.SetPlayer(this);
         playerInput.SetPlayer(this);
         playerViewmodel.SetPlayer(this);
+        playerAudio.SetPlayer(this);
 
         playerViewmodel.TurnOff();
     }
@@ -52,10 +56,18 @@ public class Player : MonoBehaviour
     }
 
     public void SetSpawn(Vector3 pos) => rb.transform.position = pos;
-    public void RespawnPlayer()       => CutsceneManager.Instance.TriggerCutscene(CutsceneManager.CutsceneType.Respawn);
+
+    public void RespawnPlayer()
+    {
+        playerAudio.StopAudio();
+        playerAudio.PlaySound(PlayerAudioClipType.Land, 0.75f);
+        CutsceneManager.Instance.TriggerCutscene(CutsceneManager.CutsceneType.Respawn);
+    }
 
     public void Explode() {
         playerViewmodel.Explode();
+        playerAudio.StopAudio();
+        playerAudio.PlaySound(PlayerAudioClipType.Explode);
         AllowMovement(false);
         rb.velocity = Vector3.zero;
     }
@@ -89,5 +101,7 @@ public class Player : MonoBehaviour
         public LayerMask       PlayerLayer     => player.playerLayer;
 
         public Camera Camera => player.cam;
+
+        public PlayerAudio PlayerAudio => player.playerAudio;
     }
 }
