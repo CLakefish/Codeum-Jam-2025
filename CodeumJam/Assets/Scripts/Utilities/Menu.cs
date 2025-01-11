@@ -66,6 +66,7 @@ public class Menu : MonoBehaviour
             panel.SetActive(false);
         }
         player.GetComponent<PlayerInput>().MouseLock = true;
+        MenuBool = false;
         Time.timeScale = 1.0f;
     }
     public void SwitchtoScene(int sceneId)

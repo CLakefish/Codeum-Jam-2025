@@ -25,4 +25,10 @@ public class PointOfInterest : Launchable
             interest.Launch(transform.position);
         }
     }
+
+    private void OnTriggerEnter(Collider other) {
+        if (other.transform.GetComponent<Collider>().TryGetComponent<Launchable>(out Launchable interest)) {
+            interest.Launch(transform.position);
+        }
+    }
 }
