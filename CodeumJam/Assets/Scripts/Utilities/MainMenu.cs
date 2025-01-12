@@ -14,6 +14,11 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private TextMeshProUGUI LevelText;
     [SerializeField] private Image image;
 
+    [Header("Cutscene")]
+    [SerializeField] private Transform endPos;
+    [SerializeField] private RotateAroundObject cam;
+    [SerializeField] private float interpolateSpeed;
+
     private int Levelid = 0;
 
     // Start is called before the first frame update
@@ -75,7 +80,7 @@ public class MainMenu : MonoBehaviour
 
     public void StartLevel()
     {
-        SceneManager.LoadScene(Levelid+1);
+        StartCoroutine(IntroCutscene(Levelid + 1));
     }
     public void ChangeVolume()
     {
@@ -94,5 +99,28 @@ public class MainMenu : MonoBehaviour
     public void Quit()
     {
         Application.Quit();
+    }
+
+    private IEnumerator IntroCutscene(int sceneID)
+    {
+        foreach (GameObject obj in menuPanels)
+        {
+            obj.SetActive(false);
+        }
+
+        cam.enabled = false;
+        Transform camTransform = cam.transform;
+        Vector3 posVel = Vector3.zero;
+        Vector3 dirVel = Vector3.zero;
+
+        while (Vector3.Distance(camTransform.position, endPos.position) > 0.01f)
+        {
+            camTransform.position = Vector3.SmoothDamp(camTransform.position, endPos.position, ref posVel, interpolateSpeed);
+            camTransform.forward = Vector3.SmoothDamp(camTransform.forward, endPos.forward, ref dirVel, interpolateSpeed);
+
+            yield return null;
+        }
+
+        SceneManager.LoadScene(sceneID);
     }
 }

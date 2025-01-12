@@ -4,12 +4,20 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(AudioSource))]
 public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] private float standardSize;
     [SerializeField] private float hoveredSize;
     [SerializeField] private float interpolationSpeed;
+    [SerializeField] private AudioClip clip;
+    private AudioSource audioSource;
     private Coroutine scaleCoroutine;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
 
     private void OnDisable()
     {
@@ -21,6 +29,7 @@ public class HoverScale : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     {
         if (scaleCoroutine != null) StopCoroutine(scaleCoroutine);
         scaleCoroutine = StartCoroutine(Scale(hoveredSize));
+        audioSource.PlayOneShot(clip);
     }
 
     public void OnPointerExit(PointerEventData eventData)

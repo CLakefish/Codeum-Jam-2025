@@ -564,8 +564,10 @@ public class PlayerMovement : Player.PlayerComponent
         public RollingWalkState(PlayerMovement context) : base(context) { }
 
         public override void Enter() {
-            context.PlayerAudio.PlaySound(PlayerAudioClipType.Land, 0.75f);
             context.HitWall?.Invoke();
+
+            if (context.PlayerAudio == null) return;
+            context.PlayerAudio.PlaySound(PlayerAudioClipType.Land, 0.75f);
         }
     }
 

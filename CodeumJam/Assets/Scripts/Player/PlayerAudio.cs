@@ -21,6 +21,9 @@ public class PlayerAudio : Player.PlayerComponent
     private void Awake()
     {
         looping.loop = true;
+
+        looping.volume     = 1.25f;
+        audioSource.volume = 1.25f;
     }
 
     public void PlaySound(PlayerAudioClipType type, float pitch = 1)

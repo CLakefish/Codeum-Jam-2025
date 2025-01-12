@@ -34,11 +34,12 @@ public class Player : MonoBehaviour
     {
         Instance = this;
 
+        playerAudio.SetPlayer(this);
+
         playerMovement.SetPlayer(this);
         playerCamera.SetPlayer(this);
         playerInput.SetPlayer(this);
         playerViewmodel.SetPlayer(this);
-        playerAudio.SetPlayer(this);
 
         playerViewmodel.TurnOff();
     }
